@@ -1,0 +1,10 @@
+---
+import GlobalLayout from "../../layouts/GlobalLayout.astro";
+import LoginPage from "../../components/Pages/Auth/LoginPage";
+
+
+export const prerender = true
+---
+<GlobalLayout title="login">
+    <LoginPage client:idle />
+</GlobalLayout>

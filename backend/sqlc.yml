@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries:
+      - "platform/database/queries"
+      - "platform/auth/queries"
+      - "app/queries"
+    schema: "platform/database/migrations"
+    #   strict_function_checks: true
+    gen:
+      go:
+        package: "dbQueries"
+        sql_package: "pgx/v5"
+        out: "platform/database/generated"
+        emit_json_tags: true
+
+
