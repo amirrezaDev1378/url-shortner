@@ -35,8 +35,6 @@ test: clean critic security lint
 	go test -v -timeout 30s -coverprofile=cover.out -cover ./...
 	go tool cover -func=cover.out
 
-build: test
-	 go -o bin/backend.exe build cmd/main.go
 
 debugger:
 	# --only-same-user=false is not safe it's just for WSL2
@@ -63,51 +61,6 @@ seeds.up:
 
 migrations.status:
 	goose -dir=./platform/database/migrations status
-
-docker.run: docker.network docker.postgres swag docker.fiber docker.redis migrate.up
-
-docker.network:
-	docker network inspect dev-network >/dev/null 2>&1 || \
-	docker network create -d bridge dev-network
-
-docker.fiber.build:
-	docker build -t fiber .
-
-docker.fiber: docker.fiber.build
-	docker run --rm -d \
-		--name cgapp-fiber \
-		--network dev-network \
-		-p 5000:5000 \
-		fiber
-
-docker.postgres:
-	docker run --rm -d \
-		--name cgapp-postgres \
-		--network dev-network \
-		-e POSTGRES_USER=postgres \
-		-e POSTGRES_PASSWORD=password \
-		-e POSTGRES_DB=postgres \
-		-v ${HOME}/dev-postgres/data/:/var/lib/postgresql/data \
-		-p 5432:5432 \
-		postgres
-
-docker.redis:
-	docker run --rm -d \
-		--name cgapp-redis \
-		--network dev-network \
-		-p 6379:6379 \
-		redis
-
-docker.stop: docker.stop.fiber docker.stop.postgres docker.stop.redis
-
-docker.stop.fiber:
-	docker stop cgapp-fiber
-
-docker.stop.postgres:
-	docker stop cgapp-postgres
-
-docker.stop.redis:
-	docker stop cgapp-redis
 
 temp-run-fe:
 	cd ../frontend && bun dev
