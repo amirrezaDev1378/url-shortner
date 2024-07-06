@@ -35,6 +35,7 @@ func FiberConfig() fiber.Config {
 			var e *fiber.Error
 			if configs.IsDev() {
 				message = err.Error()
+
 			}
 			if errors.As(err, &e) {
 				code = e.Code
