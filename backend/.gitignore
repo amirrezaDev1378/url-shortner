@@ -13,3 +13,4 @@ tmp/
 
 # Delve Debuger
 __debug*
+*.sqlite3
