@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"regexp"
 	"sync"
 	"time"
@@ -18,7 +17,6 @@ var matchLevelRegex = regexp.MustCompile(`"level"\s*:\s*"([^"]+)"`)
 
 const logDBFile = "./server-logs.sqlite3"
 const maxDBLogRows = 50 * 1000 // 10k
-var cwd, _ = os.Getwd()
 
 // fileUpdateInterval the duration of time between file operations
 const fileUpdateInterval = time.Second * 5
@@ -40,7 +38,7 @@ var (
 )
 
 func initLogDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", path.Join(cwd, logDBFile))
+	db, err := sql.Open("sqlite3", logDBFile)
 	if err != nil {
 		log.Fatal("Failed to open log database", err)
 		return nil, err
@@ -182,7 +180,7 @@ func (w *dbWriter) checkDBSize() {
 }
 func InitLogger() {
 	if loggerInitialized {
-		panic("ASSS")
+		return
 	}
 	db, err := initLogDB()
 	if err != nil {
