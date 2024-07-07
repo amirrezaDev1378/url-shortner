@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const MaxLoginAttempts = 2
+const MaxLoginAttempts = 5
 
 const UserAccountLockDuration = time.Hour
 
