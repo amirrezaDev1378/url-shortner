@@ -27,7 +27,7 @@ func EmptyServerErr() ServerError {
 }
 
 func (e *ServerError) IsNotEmpty() bool {
-	return e.Message != "" || e.Status != 0 || e.Error != nil
+	return e.Message != nil || e.Status != 0 || e.Error != nil
 }
 func (e *ServerError) SetStatus(status int) *ServerError {
 	e.Status = status
@@ -37,7 +37,7 @@ func (e *ServerError) SetStatus(status int) *ServerError {
 func (e *ServerError) SetMessage(message interface{}) *ServerError {
 	msg, ok := message.(string)
 	if !ok {
-		sLog.Error().Msgf("Error message is not a string : %v", message)
+		sLog.Error().Msgf("Error message is not a string 1: %v", message)
 	}
 	e.Message = msg
 	return e
@@ -47,9 +47,10 @@ func (e *ServerError) Send(c *fiber.Ctx) error {
 	if e.Status == 0 {
 		e.Status = fiber.StatusInternalServerError
 	}
+
 	msg, ok := e.Message.(string)
 	if !ok {
-		sLog.Error().Msgf("Error message is not a string : %v", e.Message)
+		sLog.Error().Msgf("Error message is not a string 2: %v", e.Message)
 	}
 	var response = errorResponse{
 		ErrorMessage: msg,
@@ -75,7 +76,7 @@ func (e *ServerError) GetError() error {
 	}
 	msg, ok := e.Message.(string)
 	if !ok {
-		sLog.Error().Msgf("Error message is not a string : %v", msg)
+		sLog.Error().Msgf("Error message is not a string 3: %v", msg)
 	}
 	return errors.New(msg)
 }

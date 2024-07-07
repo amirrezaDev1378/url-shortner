@@ -29,7 +29,9 @@ func InitSessionStore(db *database.Params) Params {
 		CookieHTTPOnly: true,
 		Expiration:     time.Hour * time.Duration(MaxSessionLife),
 		//TODO: -use redis for this.
-		Storage:      redis.New(),
+		Storage: redis.New(redis.Config{
+			Database: 3,
+		}),
 		CookieSecure: true,
 		KeyGenerator: utils.UUIDv4,
 
