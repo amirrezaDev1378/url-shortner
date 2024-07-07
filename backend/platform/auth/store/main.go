@@ -4,7 +4,7 @@ import (
 	"github.com/create-go-app/fiber-go-template/platform/database"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gofiber/storage/sqlite3"
+	"github.com/gofiber/storage/redis"
 	"time"
 )
 
@@ -29,7 +29,7 @@ func InitSessionStore(db *database.Params) Params {
 		CookieHTTPOnly: true,
 		Expiration:     time.Hour * time.Duration(MaxSessionLife),
 		//TODO: -use redis for this.
-		Storage:      sqlite3.New(),
+		Storage:      redis.New(),
 		CookieSecure: true,
 		KeyGenerator: utils.UUIDv4,
 

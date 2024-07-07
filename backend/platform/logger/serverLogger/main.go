@@ -3,6 +3,7 @@ package sLog
 import (
 	"database/sql"
 	"github.com/create-go-app/fiber-go-template/pkg/configs"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 	"io"
