@@ -7,6 +7,41 @@ import (
 	"reflect"
 )
 
+type SafeStruct[T any] struct {
+	isValid bool
+	values  T
+}
+
+func (s *SafeStruct[T]) Validate() error {
+	if err := validator.New().Struct(s.values); err != nil {
+		s.isValid = false
+		return err
+	}
+	s.isValid = true
+	return nil
+}
+func (s *SafeStruct[T]) IsValid() bool {
+	return s.isValid
+}
+
+func (s *SafeStruct[T]) Values() T {
+	return s.values
+}
+
+func (s *SafeStruct[T]) Fill(data T) {
+	s.values = data
+	s.isValid = false
+}
+func (s *SafeStruct[T]) SafeFill(data T) error {
+	s.values = data
+	if err := s.Validate(); err != nil {
+		var zeroValue T
+		s.values = zeroValue
+		return err
+	}
+	return nil
+}
+
 // NewPgTypeValidator func for create a new validator for model fields.
 func NewPgTypeValidator() *validator.Validate {
 	// Create a new validator for a Book model.
