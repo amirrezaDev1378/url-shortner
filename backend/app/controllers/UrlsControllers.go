@@ -82,8 +82,18 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		return ctx.JSON(url)
 	})
 	r.Delete("/delete/:id<int>", func(ctx *fiber.Ctx) error {
-		err := urlService.DeleteUrlByID(ctx.UserContext(), ctx.Locals("userID"), ctx.Params("id"))
-
+		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
+			Deleted: true,
+		})
+		if err.IsNotEmpty() {
+			return err.Send(ctx)
+		}
+		return ctx.SendStatus(204)
+	})
+	r.Put("/disable/:id<int>", func(ctx *fiber.Ctx) error {
+		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
+			Disabled: true,
+		})
 		if err.IsNotEmpty() {
 			return err.Send(ctx)
 		}

@@ -47,6 +47,11 @@ type pageResultChan struct {
 	UA      string
 }
 
+type UrlUpdatableProps struct {
+	Disabled bool `json:"disabled" validate:"omitempty,boolean"`
+	Deleted  bool `json:"deleted" validate:"omitempty,boolean"`
+}
+
 const (
 	iosRedirectPathRedisKey     = "irp"
 	generalRedirectPathRedisKey = "grp"
@@ -90,6 +95,7 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 	}
 	return urlID, nil
 }
+
 func (s *UrlService) DeleteUrlByID(ctx context.Context, userID interface{}, urlID string) appErrors.ServerError {
 	tx, err := s.DB.DBPool.Begin(ctx)
 	sErr := appErrors.ErrGeneralServerError.ServerError()
@@ -189,6 +195,38 @@ func (s *UrlService) GetStaticUrlBySlug(c *fiber.Ctx, slug string) (string, erro
 	}
 	content, err := s.getStaticUrlContent(c.Context(), slug, deviceType)
 	return content, err
+}
+func (s *UrlService) UpdateUrlProps(ctx context.Context, userID interface{}, urlID string, params UrlUpdatableProps) appErrors.ServerError {
+
+	urlIDInt, err := strconv.Atoi(urlID)
+	if err != nil {
+		s.Logger.Error().Err(err).Msg("Error while converting urlID to int")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
+	row, err := s.DB.AppQueries.GetUrlById(ctx, int32(urlIDInt))
+	if err != nil {
+		s.Logger.Error().Err(err).Msg("Error while getting url by id")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
+
+	if !utils.CompareUUIDWithString(row.CreatedBy, userID) {
+		return appErrors.ErrForbidden.ServerError()
+	}
+
+	if row.Deleted {
+		return appErrors.ErrForbidden.ServerError()
+	}
+
+	newProps := dbQueries.UpdateUrlPropsParams{
+		Disabled: params.Disabled,
+		Deleted:  params.Deleted,
+	}
+
+	if err := s.DB.AppQueries.UpdateUrlProps(ctx, newProps); err != nil {
+		s.Logger.Error().Err(err).Msg("Error while updating url props")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
+	return appErrors.EmptyServerErr()
 }
 
 func (s *UrlService) getUrlRedirectPaths(ctx context.Context, slug string) (UrlRedirectPathsData, error) {

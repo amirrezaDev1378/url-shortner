@@ -101,7 +101,7 @@ func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (stri
 }
 
 const getUrlById = `-- name: GetUrlById :one
-SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type
+SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled
 FROM urls
 WHERE id = $1
 `
@@ -114,6 +114,8 @@ type GetUrlByIdRow struct {
 	CreatedAt           pgtype.Date   `json:"created_at"`
 	CreatedBy           pgtype.UUID   `json:"created_by"`
 	Type                ValidUrlTypes `json:"type"`
+	Deleted             bool          `json:"deleted"`
+	Disabled            bool          `json:"disabled"`
 }
 
 func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, error) {
@@ -127,6 +129,8 @@ func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, erro
 		&i.CreatedAt,
 		&i.CreatedBy,
 		&i.Type,
+		&i.Deleted,
+		&i.Disabled,
 	)
 	return i, err
 }
@@ -212,28 +216,21 @@ func (q *Queries) UpdateStaticUrl(ctx context.Context, arg UpdateStaticUrlParams
 	return err
 }
 
-const updateUrl = `-- name: UpdateUrl :exec
+const updateUrlProps = `-- name: UpdateUrlProps :exec
 UPDATE urls
 SET updated_at            = NOW(),
-    slug                  = COALESCE($1, slug),
-    general_redirect_path = COALESCE($2, general_redirect_path),
-    ios_redirect_path     = COALESCE($3, ios_redirect_path)
-WHERE id = $4
+    deleted               = COALESCE($1, deleted),
+    disabled              = COALESCE($2, disabled)
+WHERE id = $3
 `
 
-type UpdateUrlParams struct {
-	Slug                string      `json:"slug"`
-	GeneralRedirectPath string      `json:"general_redirect_path"`
-	IosRedirectPath     pgtype.Text `json:"ios_redirect_path"`
-	ID                  int32       `json:"id"`
+type UpdateUrlPropsParams struct {
+	Deleted  bool  `json:"deleted"`
+	Disabled bool  `json:"disabled"`
+	ID       int32 `json:"id"`
 }
 
-func (q *Queries) UpdateUrl(ctx context.Context, arg UpdateUrlParams) error {
-	_, err := q.db.Exec(ctx, updateUrl,
-		arg.Slug,
-		arg.GeneralRedirectPath,
-		arg.IosRedirectPath,
-		arg.ID,
-	)
+func (q *Queries) UpdateUrlProps(ctx context.Context, arg UpdateUrlPropsParams) error {
+	_, err := q.db.Exec(ctx, updateUrlProps, arg.Deleted, arg.Disabled, arg.ID)
 	return err
 }

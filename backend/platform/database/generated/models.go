@@ -66,6 +66,9 @@ type Url struct {
 	CreatedAt           pgtype.Date   `json:"created_at"`
 	UpdatedAt           pgtype.Date   `json:"updated_at"`
 	CreatedBy           pgtype.UUID   `json:"created_by"`
+	ExpiresAt           pgtype.Date   `json:"expires_at"`
+	Disabled            bool          `json:"disabled"`
+	Deleted             bool          `json:"deleted"`
 	Slug                string        `json:"slug"`
 	GeneralRedirectPath string        `json:"general_redirect_path"`
 	IosRedirectPath     pgtype.Text   `json:"ios_redirect_path"`
