@@ -1,7 +1,6 @@
 package authStore
 
 import (
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -39,11 +38,11 @@ func (p *Params) GetUserSessionData(c *fiber.Ctx) (UserSessionData, error) {
 	store, err := p.SessionStore.Get(c)
 	userInfo := UserSessionData{}
 	if err != nil {
-		return userInfo, err
+		return userInfo, ErrInvalidTokenData
 	}
 	userInfo, ok := store.Get(UserInfoCookieKey).(UserSessionData)
 	if !ok {
-		return userInfo, errors.New("failed to parse user data")
+		return userInfo, ErrInvalidTokenData
 	}
 	expiry, err := time.Parse(time.DateTime, userInfo.SessionExpiry)
 	if err != nil {
