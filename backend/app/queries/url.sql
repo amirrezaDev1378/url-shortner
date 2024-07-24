@@ -1,7 +1,7 @@
 -- name: GetUrlById :one
 SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled
 FROM urls
-WHERE id = $1;
+WHERE id = $1 AND deleted = false;
 
 -- name: GetUrlBySlug :one
 SELECT general_redirect_path, ios_redirect_path
