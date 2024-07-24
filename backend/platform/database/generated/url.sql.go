@@ -77,7 +77,7 @@ func (q *Queries) DeleteUrlByID(ctx context.Context, id int32) error {
 const getStaticUrlGeneralContent = `-- name: GetStaticUrlGeneralContent :one
 SELECT general_content
 FROM static_urls
-WHERE url_id = (SELECT id FROM urls WHERE slug = $1)
+WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false)
 `
 
 func (q *Queries) GetStaticUrlGeneralContent(ctx context.Context, slug string) (string, error) {
@@ -88,16 +88,16 @@ func (q *Queries) GetStaticUrlGeneralContent(ctx context.Context, slug string) (
 }
 
 const getStaticUrlIOSContent = `-- name: GetStaticUrlIOSContent :one
-SELECT general_content
+SELECT ios_content
 FROM static_urls
-WHERE url_id = (SELECT id FROM urls WHERE slug = $1)
+WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false)
 `
 
-func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (string, error) {
+func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (pgtype.Text, error) {
 	row := q.db.QueryRow(ctx, getStaticUrlIOSContent, slug)
-	var general_content string
-	err := row.Scan(&general_content)
-	return general_content, err
+	var ios_content pgtype.Text
+	err := row.Scan(&ios_content)
+	return ios_content, err
 }
 
 const getUrlById = `-- name: GetUrlById :one
@@ -138,7 +138,7 @@ func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, erro
 const getUrlBySlug = `-- name: GetUrlBySlug :one
 SELECT general_redirect_path, ios_redirect_path
 FROM urls
-WHERE slug = $1
+WHERE slug = $1 AND deleted = false AND disabled = false
 `
 
 type GetUrlBySlugRow struct {
@@ -156,7 +156,7 @@ func (q *Queries) GetUrlBySlug(ctx context.Context, slug string) (GetUrlBySlugRo
 const getUrlsByUser = `-- name: GetUrlsByUser :many
 SELECT id, slug, ios_redirect_path, general_redirect_path, created_at
 FROM urls
-WHERE created_by = $1
+WHERE created_by = $1 AND deleted = false
 LIMIT $2
 `
 
