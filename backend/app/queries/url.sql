@@ -25,9 +25,10 @@ FROM urls
 WHERE id = $1;
 
 -- name: GetUrlsByUser :many
-SELECT id, slug, ios_redirect_path, general_redirect_path, created_at
+SELECT id, slug, ios_redirect_path, general_redirect_path, created_at, disabled
 FROM urls
 WHERE created_by = $1 AND deleted = false
+ORDER BY created_at DESC
 LIMIT $2;
 
 

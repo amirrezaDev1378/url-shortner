@@ -103,7 +103,7 @@ func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (pgty
 const getUrlById = `-- name: GetUrlById :one
 SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled
 FROM urls
-WHERE id = $1
+WHERE id = $1 AND deleted = false
 `
 
 type GetUrlByIdRow struct {
@@ -154,9 +154,10 @@ func (q *Queries) GetUrlBySlug(ctx context.Context, slug string) (GetUrlBySlugRo
 }
 
 const getUrlsByUser = `-- name: GetUrlsByUser :many
-SELECT id, slug, ios_redirect_path, general_redirect_path, created_at
+SELECT id, slug, ios_redirect_path, general_redirect_path, created_at, disabled
 FROM urls
 WHERE created_by = $1 AND deleted = false
+ORDER BY created_at DESC
 LIMIT $2
 `
 
@@ -171,6 +172,7 @@ type GetUrlsByUserRow struct {
 	IosRedirectPath     pgtype.Text `json:"ios_redirect_path"`
 	GeneralRedirectPath string      `json:"general_redirect_path"`
 	CreatedAt           pgtype.Date `json:"created_at"`
+	Disabled            bool        `json:"disabled"`
 }
 
 func (q *Queries) GetUrlsByUser(ctx context.Context, arg GetUrlsByUserParams) ([]GetUrlsByUserRow, error) {
@@ -188,6 +190,7 @@ func (q *Queries) GetUrlsByUser(ctx context.Context, arg GetUrlsByUserParams) ([
 			&i.IosRedirectPath,
 			&i.GeneralRedirectPath,
 			&i.CreatedAt,
+			&i.Disabled,
 		); err != nil {
 			return nil, err
 		}
