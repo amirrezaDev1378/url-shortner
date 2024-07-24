@@ -365,7 +365,16 @@ func (s *UrlService) getStaticUrlFromDB(ctx context.Context, slug, deviceType st
 	var err error
 	switch deviceType {
 	case iosDeviceType:
-		content, err = s.DB.AppQueries.GetStaticUrlIOSContent(ctx, slug)
+		iosContent, getContentErr := s.DB.AppQueries.GetStaticUrlIOSContent(ctx, slug)
+		if getContentErr != nil {
+			return "", err
+		}
+
+		if iosContent.String == "" {
+			content, err = s.DB.AppQueries.GetStaticUrlGeneralContent(ctx, slug)
+			break
+		}
+		content = iosContent.String
 		break
 	case generalDeviceType:
 		content, err = s.DB.AppQueries.GetStaticUrlGeneralContent(ctx, slug)
@@ -373,6 +382,7 @@ func (s *UrlService) getStaticUrlFromDB(ctx context.Context, slug, deviceType st
 	default:
 		return "", errors.New("invalid device type2")
 	}
+
 	if err != nil {
 		return "", err
 	}
