@@ -47,11 +47,13 @@ func (e *ServerError) Send(c *fiber.Ctx) error {
 	if e.Status == 0 {
 		e.Status = fiber.StatusInternalServerError
 	}
+	msg, _ := e.Message.(string)
 
-	msg, ok := e.Message.(string)
-	if !ok {
-		sLog.Error().Msgf("Error message is not a string 2: %v", e.Message)
+	if msg == "" {
+		msg = "InternalServerErrorCode2"
+		sLog.Error().Msgf("Error message can not be represented as string: %v", e.Message)
 	}
+
 	var response = errorResponse{
 		ErrorMessage: msg,
 	}
@@ -67,9 +69,9 @@ func (e *ServerError) Send(c *fiber.Ctx) error {
 	if isDevelopment && e.Message == "" {
 		sLog.Error().Msgf("No message provided for error with status : %v", e.Status)
 	}
+
 	return nil
 }
-
 func (e *ServerError) GetError() error {
 	if e.Error != nil {
 		return e.Error
@@ -120,10 +122,14 @@ func (e AppError) ServerError() ServerError {
 	if err, ok := serverErrorsCache[e]; ok {
 		return *err
 	}
-	newErr := &ServerError{Status: e.Status(), Message: e.Error()}
+	newErr := &ServerError{Status: e.Status(), Message: e.Error().Error()}
 	serverErrorsCache[e] = newErr
 
 	return *newErr
+}
+func (e AppError) SendCtx(c *fiber.Ctx) error {
+	err := e.ServerError()
+	return err.Send(c)
 }
 
 var safeInternalError = errors.New(ErrServerErr.String())
