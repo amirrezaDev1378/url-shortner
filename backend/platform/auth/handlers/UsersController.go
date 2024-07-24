@@ -1,6 +1,7 @@
 package authHandlers
 
 import (
+	"errors"
 	appErrors "github.com/create-go-app/fiber-go-template/pkg/errors"
 	"github.com/create-go-app/fiber-go-template/pkg/utils"
 	authConfig "github.com/create-go-app/fiber-go-template/platform/auth/config"
@@ -8,6 +9,7 @@ import (
 	dbQueries "github.com/create-go-app/fiber-go-template/platform/database/generated"
 	sLog "github.com/create-go-app/fiber-go-template/platform/logger/serverLogger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -43,26 +45,34 @@ func UsersController(router fiber.Router, p *authConfig.Params) {
 		return nil
 	})
 	router.Get("/user/user-info", PrivateRouteMiddleware, func(ctx *fiber.Ctx) error {
-		errorRes := appErrors.ServerError{}
-
+		//todo update error messages
+		generalServerErr := appErrors.ErrGeneralServerError.ServerError()
 		sessionData, err := p.Store.GetUserSessionData(ctx)
 		if err != nil {
-			return errorRes.SetStatus(fiber.StatusInternalServerError).Send(ctx)
+			if errors.Is(err, authStore.ErrInvalidTokenData) {
+				return appErrors.ErrForbidden.SendCtx(ctx)
+			}
+			sLog.Error().Err(err).Msg("Failed to get user session data")
+			return generalServerErr.Send(ctx)
 		}
 		userID := pgtype.UUID{}
 
 		if scanErr := userID.Scan(sessionData.UserId); scanErr != nil {
-			return errorRes.SetStatus(fiber.StatusInternalServerError).Send(ctx)
+			return generalServerErr.Send(ctx)
 		}
 		user, err := p.DB.AppQueries.GetUserById(ctx.UserContext(), userID)
 
 		if err != nil {
-			return errorRes.SetStatus(fiber.StatusInternalServerError).Send(ctx)
+			if errors.Is(err, pgx.ErrNoRows) {
+				return appErrors.ErrForbidden.SendCtx(ctx)
+			}
+			sLog.WithStackTrace(err).Send()
+			return generalServerErr.Send(ctx)
 		}
 
 		if err := ctx.JSON(UserInfoResponse{ID: sessionData.UserId, Email: user.Email}); err != nil {
 			sLog.WithStackTrace(err).Send()
-			return errorRes.SetStatus(fiber.StatusInternalServerError).Send(ctx)
+			return generalServerErr.Send(ctx)
 		}
 		return nil
 	})
