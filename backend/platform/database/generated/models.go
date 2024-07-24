@@ -62,17 +62,17 @@ type StaticUrl struct {
 }
 
 type Url struct {
-	ID                  int32         `json:"id"`
-	CreatedAt           pgtype.Date   `json:"created_at"`
-	UpdatedAt           pgtype.Date   `json:"updated_at"`
-	CreatedBy           pgtype.UUID   `json:"created_by"`
-	ExpiresAt           pgtype.Date   `json:"expires_at"`
-	Disabled            bool          `json:"disabled"`
-	Deleted             bool          `json:"deleted"`
-	Slug                string        `json:"slug"`
-	GeneralRedirectPath string        `json:"general_redirect_path"`
-	IosRedirectPath     pgtype.Text   `json:"ios_redirect_path"`
-	Type                ValidUrlTypes `json:"type"`
+	ID                  int32            `json:"id"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	UpdatedAt           pgtype.Timestamp `json:"updated_at"`
+	CreatedBy           pgtype.UUID      `json:"created_by"`
+	ExpiresAt           pgtype.Timestamp `json:"expires_at"`
+	Disabled            bool             `json:"disabled"`
+	Deleted             bool             `json:"deleted"`
+	Slug                string           `json:"slug"`
+	GeneralRedirectPath string           `json:"general_redirect_path"`
+	IosRedirectPath     pgtype.Text      `json:"ios_redirect_path"`
+	Type                ValidUrlTypes    `json:"type"`
 }
 
 type User struct {

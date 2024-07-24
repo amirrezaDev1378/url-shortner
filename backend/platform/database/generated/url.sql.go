@@ -107,15 +107,15 @@ WHERE id = $1 AND deleted = false
 `
 
 type GetUrlByIdRow struct {
-	ID                  int32         `json:"id"`
-	Slug                string        `json:"slug"`
-	GeneralRedirectPath string        `json:"general_redirect_path"`
-	IosRedirectPath     pgtype.Text   `json:"ios_redirect_path"`
-	CreatedAt           pgtype.Date   `json:"created_at"`
-	CreatedBy           pgtype.UUID   `json:"created_by"`
-	Type                ValidUrlTypes `json:"type"`
-	Deleted             bool          `json:"deleted"`
-	Disabled            bool          `json:"disabled"`
+	ID                  int32            `json:"id"`
+	Slug                string           `json:"slug"`
+	GeneralRedirectPath string           `json:"general_redirect_path"`
+	IosRedirectPath     pgtype.Text      `json:"ios_redirect_path"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	CreatedBy           pgtype.UUID      `json:"created_by"`
+	Type                ValidUrlTypes    `json:"type"`
+	Deleted             bool             `json:"deleted"`
+	Disabled            bool             `json:"disabled"`
 }
 
 func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, error) {
@@ -167,12 +167,12 @@ type GetUrlsByUserParams struct {
 }
 
 type GetUrlsByUserRow struct {
-	ID                  int32       `json:"id"`
-	Slug                string      `json:"slug"`
-	IosRedirectPath     pgtype.Text `json:"ios_redirect_path"`
-	GeneralRedirectPath string      `json:"general_redirect_path"`
-	CreatedAt           pgtype.Date `json:"created_at"`
-	Disabled            bool        `json:"disabled"`
+	ID                  int32            `json:"id"`
+	Slug                string           `json:"slug"`
+	IosRedirectPath     pgtype.Text      `json:"ios_redirect_path"`
+	GeneralRedirectPath string           `json:"general_redirect_path"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	Disabled            bool             `json:"disabled"`
 }
 
 func (q *Queries) GetUrlsByUser(ctx context.Context, arg GetUrlsByUserParams) ([]GetUrlsByUserRow, error) {
