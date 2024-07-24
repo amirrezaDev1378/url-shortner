@@ -20,10 +20,10 @@ CREATE TYPE valid_url_types AS ENUM ('direct', 'static');
 CREATE TABLE urls
 (
     id                    SERIAL             NOT NULL UNIQUE PRIMARY KEY,
-    created_at            DATE               NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at            DATE               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at            TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by            uuid                        DEFAULT NULL,
-    expires_at            DATE               NULL,
+    expires_at            TIMESTAMP          NULL,
     disabled              BOOLEAN            NOT NULL DEFAULT FALSE,
     deleted               BOOLEAN            NOT NULL DEFAULT FALSE,
     slug                  VARCHAR(50) UNIQUE NOT NULL,
