@@ -13,4 +13,8 @@ tmp/
 
 # Delve Debuger
 __debug*
+
+# DataBase
+*.rdb
+*.log
 *.sqlite3
