@@ -18,4 +18,5 @@ var statusCodes = map[AppError]int{
 	"ERR_GENERAL_SERVER_ERROR":     500,
 	"ERR_FORBIDDEN":                403,
 	"ERR_INVALID_HTML_CONTENT":     400,
+	"ERR_NOT_FOUND":                404,
 }
