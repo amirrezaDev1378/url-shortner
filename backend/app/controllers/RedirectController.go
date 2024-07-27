@@ -10,7 +10,9 @@ import (
 	"strings"
 )
 
-const RedirectMatchRegex = "^(?i)[A-Za-z0-9]+$"
+const RedirectMatchRegex = "^(?i)[A-Za-z0-9_]+$"
+
+//TODO - this  controller is returning improper errors and exposes the error to the user use static html for it...
 
 // RedirectController ! Do not use this in the controller, it is only for the main.go file
 func RedirectController(app *fiber.App, db *database.Params, redisClients cache.RedisClients) {
