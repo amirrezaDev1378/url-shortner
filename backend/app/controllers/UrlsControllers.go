@@ -88,7 +88,7 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		if err.IsNotEmpty() {
 			return err.Send(ctx)
 		}
-		return ctx.SendStatus(204)
+		return ctx.Status(201).Send(nil)
 	})
 	r.Put("/disable/:id<int>", func(ctx *fiber.Ctx) error {
 		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
@@ -97,6 +97,15 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		if err.IsNotEmpty() {
 			return err.Send(ctx)
 		}
-		return ctx.SendStatus(204)
+		return ctx.Status(201).Send(nil)
+	})
+	r.Put("/enable/:id<int>", func(ctx *fiber.Ctx) error {
+		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
+			Disabled: false,
+		})
+		if err.IsNotEmpty() {
+			return err.Send(ctx)
+		}
+		return ctx.Status(201).Send(nil)
 	})
 }
