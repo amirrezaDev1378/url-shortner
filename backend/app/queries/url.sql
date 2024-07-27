@@ -45,6 +45,12 @@ WHERE url_id = $3;
 DELETE FROM static_urls
 WHERE url_id = $1;
 
+
+-- name: GetStaticUrlByUrlID :one
+SELECT *
+FROM static_urls
+WHERE url_id = $1;
+
 -- name: GetStaticUrlGeneralContent :one
 SELECT general_content
 FROM static_urls

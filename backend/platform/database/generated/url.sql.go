@@ -74,6 +74,23 @@ func (q *Queries) DeleteUrlByID(ctx context.Context, id int32) error {
 	return err
 }
 
+const getStaticUrlByUrlID = `-- name: GetStaticUrlByUrlID :one
+SELECT id, updated_at, url_id, general_content, ios_content FROM static_urls WHERE url_id = $1
+`
+
+func (q *Queries) GetStaticUrlByUrlID(ctx context.Context, urlID int32) (StaticUrl, error) {
+	row := q.db.QueryRow(ctx, getStaticUrlByUrlID, urlID)
+	var i StaticUrl
+	err := row.Scan(
+		&i.ID,
+		&i.UpdatedAt,
+		&i.UrlID,
+		&i.GeneralContent,
+		&i.IosContent,
+	)
+	return i, err
+}
+
 const getStaticUrlGeneralContent = `-- name: GetStaticUrlGeneralContent :one
 SELECT general_content
 FROM static_urls
