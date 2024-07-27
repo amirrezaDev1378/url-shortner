@@ -197,14 +197,24 @@ func (s *UrlService) GetStaticUrlBySlug(c *fiber.Ctx, slug string) (string, erro
 	return content, err
 }
 func (s *UrlService) UpdateUrlProps(ctx context.Context, userID interface{}, urlID string, params UrlUpdatableProps) appErrors.ServerError {
+	tx, err := s.DB.DBPool.Begin(ctx)
+	defer tx.Rollback(ctx)
+	if err != nil {
+		s.Logger.Error().Err(err).Msg("Error while creating transaction")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
 
 	urlIDInt, err := strconv.Atoi(urlID)
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while converting urlID to int")
 		return appErrors.ErrGeneralServerError.ServerError()
 	}
+
 	row, err := s.DB.AppQueries.GetUrlById(ctx, int32(urlIDInt))
 	if err != nil {
+		if database.IsNoRowsErr(err) {
+			return appErrors.ErrNotFound.ServerError()
+		}
 		s.Logger.Error().Err(err).Msg("Error while getting url by id")
 		return appErrors.ErrGeneralServerError.ServerError()
 	}
@@ -217,13 +227,24 @@ func (s *UrlService) UpdateUrlProps(ctx context.Context, userID interface{}, url
 		return appErrors.ErrForbidden.ServerError()
 	}
 
-	newProps := dbQueries.UpdateUrlPropsParams{
+	updatedUrlProps := dbQueries.UpdateUrlPropsParams{
 		Disabled: params.Disabled,
 		Deleted:  params.Deleted,
+		ID:       int32(urlIDInt),
 	}
 
-	if err := s.DB.AppQueries.UpdateUrlProps(ctx, newProps); err != nil {
+	if err := s.DB.AppQueries.UpdateUrlProps(ctx, updatedUrlProps); err != nil {
 		s.Logger.Error().Err(err).Msg("Error while updating url props")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
+
+	if err := s.handleUrlPropsChange(ctx, row, params); err != nil {
+		s.Logger.Error().Err(err).Msg("Error while handling url props change")
+		return appErrors.ErrGeneralServerError.ServerError()
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		s.Logger.Error().Err(err).Msg("Error while committing transaction")
 		return appErrors.ErrGeneralServerError.ServerError()
 	}
 	return appErrors.EmptyServerErr()
@@ -420,6 +441,36 @@ func (s *UrlService) deleteUrlFromRedis(ctx context.Context, slug string) error 
 		return err
 	}
 	return nil
+}
+
+func (s *UrlService) handleUrlPropsChange(ctx context.Context, row dbQueries.GetUrlByIdRow, updatedProps UrlUpdatableProps) error {
+	shouldDeleteFromRedis := updatedProps.Deleted || updatedProps.Disabled
+	if shouldDeleteFromRedis {
+		return s.deleteUrlFromRedis(ctx, row.Slug)
+	}
+	switch row.Type {
+	case "direct":
+		return s.setDirectUrlInRedis(ctx, row.Slug, UrlRedirectPathsData{
+			IosRedirectPath:     row.IosRedirectPath.String,
+			GeneralRedirectPath: row.GeneralRedirectPath,
+		})
+	case "static":
+		staticUrl, err := s.DB.AppQueries.GetStaticUrlByUrlID(ctx, row.ID)
+		if err != nil {
+			return err
+		}
+		if staticUrl.IosContent.Valid {
+			err := s.setStaticUrlInRedis(ctx, row.Slug, iosDeviceType, staticUrl.IosContent.String)
+			if err != nil {
+				return err
+			}
+		}
+
+		return s.setStaticUrlInRedis(ctx, row.Slug, generalDeviceType, staticUrl.GeneralContent)
+	default:
+		s.Logger.Error().Msg("Invalid url type")
+		return errors.New("invalid url type provided " + string(row.Type))
+	}
 }
 
 func fetchAndParsePageWithUserAgent(ctx context.Context, targetUrl, userAgent string, resChan chan pageResultChan) {
