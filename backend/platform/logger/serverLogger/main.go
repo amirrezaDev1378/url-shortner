@@ -201,6 +201,7 @@ func InitLogger() {
 
 	DBLogWriter := &dbWriter{db}
 	logger := zerolog.New(zerolog.MultiLevelWriter(&ConsoleWriter, DBLogWriter)).With().Timestamp().Logger()
+	logger = logger.Hook(&AddParentFunctionNameHook{})
 
 	zerologInstance = logger
 
