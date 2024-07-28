@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/jackc/pgx/v5/pgtype"
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+	"time"
+)
 
 func GetUUIDFromString(userID interface{}) (pgtype.UUID, error) {
 	UUID := pgtype.UUID{}
@@ -37,4 +40,12 @@ func CompareUUIDWithString(uuid1 pgtype.UUID, uuid2 interface{}) bool {
 		return true
 	}
 	return false
+}
+
+func GetPGTimeStamp(timeString string, format string) (pgtype.Timestamp, error) {
+	parsedTime, err := time.Parse(format, timeString)
+	if err != nil {
+		return pgtype.Timestamp{}, err
+	}
+	return pgtype.Timestamp{Time: parsedTime, Valid: true}, nil
 }
