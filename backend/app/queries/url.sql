@@ -1,16 +1,26 @@
 -- name: GetUrlById :one
-SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled
+SELECT id,
+       slug,
+       general_redirect_path,
+       ios_redirect_path,
+       created_at,
+       created_by,
+       type,
+       deleted,
+       disabled,
+       expires_at
 FROM urls
 WHERE id = $1 AND deleted = false;
 
 -- name: GetUrlBySlug :one
-SELECT general_redirect_path, ios_redirect_path
+SELECT general_redirect_path, ios_redirect_path, expires_at
 FROM urls
 WHERE slug = $1 AND deleted = false AND disabled = false;
 
 -- name: CreateUrl :one
-INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type)
-VALUES ($1, $2, $3, $4, $5) RETURNING id;
+INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type, expires_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id;
 
 -- name: UpdateUrlProps :exec
 UPDATE urls
