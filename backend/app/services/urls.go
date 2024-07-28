@@ -12,7 +12,6 @@ import (
 	dbQueries "github.com/create-go-app/fiber-go-template/platform/database/generated"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rs/zerolog"
 	"io"
@@ -21,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 type UrlService struct {
@@ -61,18 +61,17 @@ const (
 )
 
 func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlParams) (int32, error) {
+	if (params.Type == "direct" && params.Slug[0] != 'd') || (params.Type == "static" && params.Slug[0] != 's') {
+		return 0, appErrors.ErrInvalidPayload.Error()
+	}
+
 	tx, err := s.DB.DBPool.Begin(ctx)
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while creating transaction")
 		return 0, err
 	}
 
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err := tx.Rollback(ctx)
-		if err != nil {
-			s.Logger.Error().Msg(err.Error())
-		}
-	}(tx, ctx)
+	defer tx.Rollback(ctx)
 
 	qtx := s.DB.AppQueries.WithTx(tx)
 
@@ -80,6 +79,16 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while running create url query")
 		return 0, err
+	}
+	if params.Type == "direct" {
+		err := s.setDirectUrlInRedis(ctx, params.Slug, UrlRedirectPathsData{
+			GeneralRedirectPath: params.GeneralRedirectPath,
+			IosRedirectPath:     params.IosRedirectPath.String,
+		}, params.ExpiresAt.Time)
+		if err != nil {
+			s.Logger.Error().Err(err).Msg("Error while setting direct url in redis")
+			return 0, err
+		}
 	}
 	if params.Type == "static" {
 		err = s.createStaticURL(ctx, qtx, urlID, params)
@@ -262,7 +271,7 @@ func (s *UrlService) getUrlRedirectPaths(ctx context.Context, slug string) (UrlR
 		}
 		redirectPaths.GeneralRedirectPath = urlRedirectPaths.GeneralRedirectPath
 		redirectPaths.IosRedirectPath = urlRedirectPaths.IosRedirectPath.String
-		err = s.setDirectUrlInRedis(ctx, slug, redirectPaths)
+		err = s.setDirectUrlInRedis(ctx, slug, redirectPaths, urlRedirectPaths.ExpiresAt.Time)
 		if err != nil {
 			return redirectPaths, err
 		}
@@ -351,10 +360,10 @@ func (s *UrlService) createStaticURL(ctx context.Context, qtx *dbQueries.Queries
 		return err
 	}
 
-	if err := s.setStaticUrlInRedis(ctx, params.Slug, generalDeviceType, generalPageContent); err != nil {
+	if err := s.setStaticUrlInRedis(ctx, params.Slug, generalDeviceType, generalPageContent, params.ExpiresAt.Time); err != nil {
 		return err
 	}
-	if err := s.setStaticUrlInRedis(ctx, params.Slug, iosDeviceType, iosPageContent); err != nil {
+	if err := s.setStaticUrlInRedis(ctx, params.Slug, iosDeviceType, iosPageContent, params.ExpiresAt.Time); err != nil {
 		return err
 	}
 
@@ -401,7 +410,7 @@ func (s *UrlService) getStaticUrlFromDB(ctx context.Context, slug, deviceType st
 		content, err = s.DB.AppQueries.GetStaticUrlGeneralContent(ctx, slug)
 		break
 	default:
-		return "", errors.New("invalid device type2")
+		return "", errors.New("getStaticUrlFromDB -- invalid device type")
 	}
 
 	if err != nil {
@@ -411,25 +420,47 @@ func (s *UrlService) getStaticUrlFromDB(ctx context.Context, slug, deviceType st
 		return "", errors.New("content not found")
 	}
 
-	if err := s.setStaticUrlInRedis(ctx, slug, deviceType, content); err != nil {
+	urlData, err := s.DB.AppQueries.GetUrlBySlug(ctx, slug)
+	if err != nil {
+		return "", err
+	}
+
+	if err := s.setStaticUrlInRedis(ctx, slug, deviceType, content, urlData.ExpiresAt.Time); err != nil {
 		return "", err
 	}
 
 	return content, nil
 }
 
-func (s *UrlService) setDirectUrlInRedis(ctx context.Context, slug string, redirectUrl UrlRedirectPathsData) error {
-	return s.Redis.DirectUrlClient.HSet(ctx, slug, generalRedirectPathRedisKey, redirectUrl.GeneralRedirectPath, iosRedirectPathRedisKey, redirectUrl.IosRedirectPath).Err()
+func (s *UrlService) setDirectUrlInRedis(ctx context.Context, slug string, redirectUrl UrlRedirectPathsData, exp time.Time) error {
+	err := s.Redis.DirectUrlClient.HSet(ctx, slug, generalRedirectPathRedisKey, redirectUrl.GeneralRedirectPath, iosRedirectPathRedisKey, redirectUrl.IosRedirectPath).Err()
+	if err != nil {
+		return err
+	}
+
+	if !exp.IsZero() {
+		return s.Redis.DirectUrlClient.ExpireAt(ctx, slug, exp).Err()
+	}
+	return nil
 }
-func (s *UrlService) setStaticUrlInRedis(ctx context.Context, slug, deviceType, content string) error {
+func (s *UrlService) setStaticUrlInRedis(ctx context.Context, slug, deviceType, content string, exp time.Time) error {
 	switch deviceType {
 	case iosDeviceType:
-		return s.Redis.StaticUrlClient.HSet(ctx, slug, iosRedirectPathRedisKey, content).Err()
+		if err := s.Redis.StaticUrlClient.HSet(ctx, slug, iosRedirectPathRedisKey, content).Err(); err != nil {
+			return err
+		}
 	case generalDeviceType:
-		return s.Redis.StaticUrlClient.HSet(ctx, slug, generalRedirectPathRedisKey, content).Err()
+		if err := s.Redis.StaticUrlClient.HSet(ctx, slug, generalRedirectPathRedisKey, content).Err(); err != nil {
+			return err
+		}
 	default:
-		return errors.New("invalid device type1")
+		return errors.New("setStaticUrlInRedis -- invalid device type")
 	}
+
+	if !exp.IsZero() {
+		return s.Redis.StaticUrlClient.ExpireAt(ctx, slug, exp).Err()
+	}
+	return nil
 }
 
 func (s *UrlService) deleteUrlFromRedis(ctx context.Context, slug string) error {
@@ -453,20 +484,20 @@ func (s *UrlService) handleUrlPropsChange(ctx context.Context, row dbQueries.Get
 		return s.setDirectUrlInRedis(ctx, row.Slug, UrlRedirectPathsData{
 			IosRedirectPath:     row.IosRedirectPath.String,
 			GeneralRedirectPath: row.GeneralRedirectPath,
-		})
+		}, row.ExpiresAt.Time)
 	case "static":
 		staticUrl, err := s.DB.AppQueries.GetStaticUrlByUrlID(ctx, row.ID)
 		if err != nil {
 			return err
 		}
 		if staticUrl.IosContent.Valid {
-			err := s.setStaticUrlInRedis(ctx, row.Slug, iosDeviceType, staticUrl.IosContent.String)
+			err := s.setStaticUrlInRedis(ctx, row.Slug, iosDeviceType, staticUrl.IosContent.String, row.ExpiresAt.Time)
 			if err != nil {
 				return err
 			}
 		}
 
-		return s.setStaticUrlInRedis(ctx, row.Slug, generalDeviceType, staticUrl.GeneralContent)
+		return s.setStaticUrlInRedis(ctx, row.Slug, generalDeviceType, staticUrl.GeneralContent, row.ExpiresAt.Time)
 	default:
 		s.Logger.Error().Msg("Invalid url type")
 		return errors.New("invalid url type provided " + string(row.Type))
