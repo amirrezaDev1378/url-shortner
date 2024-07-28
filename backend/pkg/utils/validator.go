@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgtype"
 	"reflect"
 )
@@ -10,6 +11,20 @@ import (
 type SafeStruct[T any] struct {
 	isValid bool
 	values  T
+}
+
+// CtxBodyParser func for parsing request body and validating it.
+// error can be validation error or fiber body parser error
+func (s *SafeStruct[T]) CtxBodyParser(ctx *fiber.Ctx) error {
+	if err := ctx.BodyParser(&s.values); err != nil {
+		return err
+	}
+
+	if err := s.Validate(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *SafeStruct[T]) Validate() error {
