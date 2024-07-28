@@ -28,16 +28,17 @@ func (q *Queries) CreateStaticUrl(ctx context.Context, arg CreateStaticUrlParams
 }
 
 const createUrl = `-- name: CreateUrl :one
-INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type)
-VALUES ($1, $2, $3, $4, $5) RETURNING id
+INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type , expires_at)
+VALUES ($1, $2, $3, $4, $5,$6) RETURNING id
 `
 
 type CreateUrlParams struct {
-	CreatedBy           pgtype.UUID   `json:"created_by"`
-	Slug                string        `json:"slug"`
-	GeneralRedirectPath string        `json:"general_redirect_path"`
-	IosRedirectPath     pgtype.Text   `json:"ios_redirect_path"`
-	Type                ValidUrlTypes `json:"type"`
+	CreatedBy           pgtype.UUID      `json:"created_by"`
+	Slug                string           `json:"slug"`
+	GeneralRedirectPath string           `json:"general_redirect_path"`
+	IosRedirectPath     pgtype.Text      `json:"ios_redirect_path"`
+	Type                ValidUrlTypes    `json:"type"`
+	ExpiresAt           pgtype.Timestamp `json:"expires_at"`
 }
 
 func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (int32, error) {
@@ -47,6 +48,7 @@ func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (int32, er
 		arg.GeneralRedirectPath,
 		arg.IosRedirectPath,
 		arg.Type,
+		arg.ExpiresAt,
 	)
 	var id int32
 	err := row.Scan(&id)
@@ -75,7 +77,9 @@ func (q *Queries) DeleteUrlByID(ctx context.Context, id int32) error {
 }
 
 const getStaticUrlByUrlID = `-- name: GetStaticUrlByUrlID :one
-SELECT id, updated_at, url_id, general_content, ios_content FROM static_urls WHERE url_id = $1
+SELECT id, updated_at, url_id, general_content, ios_content
+FROM static_urls
+WHERE url_id = $1
 `
 
 func (q *Queries) GetStaticUrlByUrlID(ctx context.Context, urlID int32) (StaticUrl, error) {
@@ -118,7 +122,7 @@ func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (pgty
 }
 
 const getUrlById = `-- name: GetUrlById :one
-SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled
+SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled,expires_at
 FROM urls
 WHERE id = $1 AND deleted = false
 `
@@ -133,6 +137,7 @@ type GetUrlByIdRow struct {
 	Type                ValidUrlTypes    `json:"type"`
 	Deleted             bool             `json:"deleted"`
 	Disabled            bool             `json:"disabled"`
+	ExpiresAt           pgtype.Timestamp `json:"expires_at"`
 }
 
 func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, error) {
@@ -148,25 +153,27 @@ func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, erro
 		&i.Type,
 		&i.Deleted,
 		&i.Disabled,
+		&i.ExpiresAt,
 	)
 	return i, err
 }
 
 const getUrlBySlug = `-- name: GetUrlBySlug :one
-SELECT general_redirect_path, ios_redirect_path
+SELECT general_redirect_path, ios_redirect_path , expires_at
 FROM urls
 WHERE slug = $1 AND deleted = false AND disabled = false
 `
 
 type GetUrlBySlugRow struct {
-	GeneralRedirectPath string      `json:"general_redirect_path"`
-	IosRedirectPath     pgtype.Text `json:"ios_redirect_path"`
+	GeneralRedirectPath string           `json:"general_redirect_path"`
+	IosRedirectPath     pgtype.Text      `json:"ios_redirect_path"`
+	ExpiresAt           pgtype.Timestamp `json:"expires_at"`
 }
 
 func (q *Queries) GetUrlBySlug(ctx context.Context, slug string) (GetUrlBySlugRow, error) {
 	row := q.db.QueryRow(ctx, getUrlBySlug, slug)
 	var i GetUrlBySlugRow
-	err := row.Scan(&i.GeneralRedirectPath, &i.IosRedirectPath)
+	err := row.Scan(&i.GeneralRedirectPath, &i.IosRedirectPath, &i.ExpiresAt)
 	return i, err
 }
 
