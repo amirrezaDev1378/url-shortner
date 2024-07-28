@@ -19,4 +19,5 @@ var statusCodes = map[AppError]int{
 	"ERR_FORBIDDEN":                403,
 	"ERR_INVALID_HTML_CONTENT":     400,
 	"ERR_NOT_FOUND":                404,
+	"ERR_SLUG_ALREADY_EXISTS":      400,
 }
