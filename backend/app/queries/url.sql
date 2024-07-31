@@ -24,9 +24,9 @@ RETURNING id;
 
 -- name: UpdateUrlProps :exec
 UPDATE urls
-SET updated_at            = NOW(),
-    deleted               = COALESCE($1, deleted),
-    disabled              = COALESCE($2, disabled)
+SET updated_at = NOW(),
+    deleted    = COALESCE($1, deleted),
+    disabled   = COALESCE($2, disabled)
 WHERE id = $3;
 
 -- name: DeleteUrlByID :exec
@@ -70,4 +70,12 @@ WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disa
 SELECT ios_content
 FROM static_urls
 WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false);
+
+
+-- name: DeleteExpiredUrls :exec
+UPDATE urls
+SET deleted  = TRUE,
+    disabled = TRUE
+WHERE expires_at < (NOW() + $1)
+  AND (deleted != TRUE OR disabled != TRUE);
 
