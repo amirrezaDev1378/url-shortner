@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/create-go-app/fiber-go-template/app/controllers"
+	"github.com/create-go-app/fiber-go-template/cmd/jobs"
 	"github.com/create-go-app/fiber-go-template/pkg/configs"
 	appErrors "github.com/create-go-app/fiber-go-template/pkg/errors"
 	"github.com/create-go-app/fiber-go-template/pkg/utils"
@@ -31,7 +32,7 @@ func FiberConfig() fiber.Config {
 		ReadTimeout: time.Second * time.Duration(readTimeoutSecondsCount),
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
-			message := "appErrors.ErrServerErr.String()"
+			message := appErrors.ErrServerErr.String()
 			var e *fiber.Error
 			if configs.IsDev() {
 				message = err.Error()
@@ -91,9 +92,16 @@ func main() {
 	}
 	appControllers.InitControllers(apiRouter)
 
+	backgroundJobs := jobs.Config{
+		DB:    &databaseParams,
+		Redis: redisClients,
+	}
+
+	backgroundJobs.InitJobs()
+
 	// Start server (with or without graceful shutdown)
-	utils.StartServer(app)
 	if os.Getenv("STAGE_STATUS") == "dev" {
+		utils.StartServer(app)
 	} else {
 		utils.StartServerWithGracefulShutdown(app)
 	}
