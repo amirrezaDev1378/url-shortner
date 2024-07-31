@@ -22,7 +22,7 @@ const maxDBLogRows = 50 * 1000 // 10k
 var cwd, _ = os.Getwd()
 
 // fileUpdateInterval the duration of time between file operations
-const fileUpdateInterval = time.Second * 5
+const fileUpdateInterval = time.Second * 10
 
 const createLogTableQuery = `
 	CREATE TABLE IF NOT EXISTS logs (
