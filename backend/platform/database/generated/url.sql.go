@@ -28,8 +28,9 @@ func (q *Queries) CreateStaticUrl(ctx context.Context, arg CreateStaticUrlParams
 }
 
 const createUrl = `-- name: CreateUrl :one
-INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type , expires_at)
-VALUES ($1, $2, $3, $4, $5,$6) RETURNING id
+INSERT INTO urls (created_by, slug, general_redirect_path, ios_redirect_path, type, expires_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id
 `
 
 type CreateUrlParams struct {
@@ -55,8 +56,20 @@ func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (int32, er
 	return id, err
 }
 
+const deleteExpiredUrls = `-- name: DeleteExpiredUrls :exec
+UPDATE urls
+SET deleted = true, disabled = true
+WHERE expires_at < (NOW() + $1) AND (deleted != true OR disabled != true)
+`
+
+func (q *Queries) DeleteExpiredUrls(ctx context.Context, dollar_1 interface{}) error {
+	_, err := q.db.Exec(ctx, deleteExpiredUrls, dollar_1)
+	return err
+}
+
 const deleteStaticUrlByOwnerID = `-- name: DeleteStaticUrlByOwnerID :exec
-DELETE FROM static_urls
+DELETE
+FROM static_urls
 WHERE url_id = $1
 `
 
@@ -98,7 +111,7 @@ func (q *Queries) GetStaticUrlByUrlID(ctx context.Context, urlID int32) (StaticU
 const getStaticUrlGeneralContent = `-- name: GetStaticUrlGeneralContent :one
 SELECT general_content
 FROM static_urls
-WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false)
+WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = FALSE AND disabled = FALSE)
 `
 
 func (q *Queries) GetStaticUrlGeneralContent(ctx context.Context, slug string) (string, error) {
@@ -111,7 +124,7 @@ func (q *Queries) GetStaticUrlGeneralContent(ctx context.Context, slug string) (
 const getStaticUrlIOSContent = `-- name: GetStaticUrlIOSContent :one
 SELECT ios_content
 FROM static_urls
-WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false)
+WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = FALSE AND disabled = FALSE)
 `
 
 func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (pgtype.Text, error) {
@@ -122,9 +135,19 @@ func (q *Queries) GetStaticUrlIOSContent(ctx context.Context, slug string) (pgty
 }
 
 const getUrlById = `-- name: GetUrlById :one
-SELECT id, slug, general_redirect_path, ios_redirect_path, created_at,created_by,type,deleted,disabled,expires_at
+SELECT id,
+       slug,
+       general_redirect_path,
+       ios_redirect_path,
+       created_at,
+       created_by,
+       type,
+       deleted,
+       disabled,
+       expires_at
 FROM urls
-WHERE id = $1 AND deleted = false
+WHERE id = $1
+  AND deleted = FALSE
 `
 
 type GetUrlByIdRow struct {
@@ -159,9 +182,11 @@ func (q *Queries) GetUrlById(ctx context.Context, id int32) (GetUrlByIdRow, erro
 }
 
 const getUrlBySlug = `-- name: GetUrlBySlug :one
-SELECT general_redirect_path, ios_redirect_path , expires_at
+SELECT general_redirect_path, ios_redirect_path, expires_at
 FROM urls
-WHERE slug = $1 AND deleted = false AND disabled = false
+WHERE slug = $1
+  AND deleted = FALSE
+  AND disabled = FALSE
 `
 
 type GetUrlBySlugRow struct {
@@ -180,7 +205,8 @@ func (q *Queries) GetUrlBySlug(ctx context.Context, slug string) (GetUrlBySlugRo
 const getUrlsByUser = `-- name: GetUrlsByUser :many
 SELECT id, slug, ios_redirect_path, general_redirect_path, created_at, disabled
 FROM urls
-WHERE created_by = $1 AND deleted = false
+WHERE created_by = $1
+  AND deleted = FALSE
 ORDER BY created_at DESC
 LIMIT $2
 `
@@ -245,9 +271,9 @@ func (q *Queries) UpdateStaticUrl(ctx context.Context, arg UpdateStaticUrlParams
 
 const updateUrlProps = `-- name: UpdateUrlProps :exec
 UPDATE urls
-SET updated_at            = NOW(),
-    deleted               = COALESCE($1, deleted),
-    disabled              = COALESCE($2, disabled)
+SET updated_at = NOW(),
+    deleted    = COALESCE($1, deleted),
+    disabled   = COALESCE($2, disabled)
 WHERE id = $3
 `
 
