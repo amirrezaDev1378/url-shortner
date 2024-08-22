@@ -16,7 +16,7 @@ CREATE TABLE users
     reset_password_expires DATE        NULL
 );
 
-CREATE TYPE valid_url_types AS ENUM ('direct', 'static');
+CREATE TYPE valid_url_types AS ENUM ('direct', 'static' , 'temp-slug');
 CREATE TABLE urls
 (
     id                    SERIAL             NOT NULL UNIQUE PRIMARY KEY,
