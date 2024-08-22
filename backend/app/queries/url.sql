@@ -71,11 +71,26 @@ SELECT ios_content
 FROM static_urls
 WHERE url_id = (SELECT id FROM urls WHERE slug = $1 AND deleted = false AND disabled = false);
 
+-- name: DeleteExpiredTempSlugs :exec
+DELETE
+FROM urls
+WHERE expires_at < (NOW())
+  AND (type = 'temp-slug');
 
 -- name: DeleteExpiredUrls :exec
 UPDATE urls
 SET deleted  = TRUE,
     disabled = TRUE
 WHERE expires_at < (NOW() + $1)
+  AND type != 'temp-slug'
   AND (deleted != TRUE OR disabled != TRUE);
 
+
+-- name: CreateRandomSlug :one
+INSERT INTO urls (slug, general_redirect_path, type, expires_at, disabled)
+VALUES ((SELECT base62_encode(COUNT(*)) FROM urls),
+        '',
+        'temp-slug',
+        NOW() + INTERVAL '30 minutes',
+        TRUE)
+RETURNING slug;
