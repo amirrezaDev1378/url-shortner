@@ -41,7 +41,7 @@ func FiberConfig() fiber.Config {
 				code = e.Code
 				message = e.Message
 			}
-			sLog.Error().Err(err).Msg("unhandled handler error")
+			sLog.WithStackTrace(err).Msg("unhandled handler error")
 			c.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
 			return c.Status(code).SendString(message)
 		},
@@ -100,7 +100,7 @@ func main() {
 	backgroundJobs.InitJobs()
 
 	// Start server (with or without graceful shutdown)
-	if os.Getenv("STAGE_STATUS") == "dev" {
+	if configs.IsDev() {
 		utils.StartServer(app)
 	} else {
 		utils.StartServerWithGracefulShutdown(app)
