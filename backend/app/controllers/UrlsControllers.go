@@ -21,10 +21,6 @@ const maxTempUrlExpiration = time.Hour * 24 * 31
 
 func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 	urlRouter := router.Group("/urls")
-	urlRouter.Use(authHandlers.PrivateRouteMiddleware)
-
-	// router for temporary urls that doesn't require authentication.
-	tempUrlRouter := router.Group("/temp-urls")
 
 	logger := sLog.WithScoopLogger("URLS_CONTROLLER")
 	urlService := services.UrlService{
@@ -33,7 +29,8 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		Logger: sLog.WithScoopLogger("URL_SERVICE_CONTROLLER"),
 	}
 
-	tempUrlRouter.Post("/create", func(ctx *fiber.Ctx) error {
+	// not authenticated routes
+	router.Post("/temp-urls/create", func(ctx *fiber.Ctx) error {
 		cancel, handleError := utils.SetExecutionTimeOut(ctx, time.Second*12)
 		defer cancel()
 
@@ -84,7 +81,22 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		ctx.Status(201).SendString(strconv.Itoa(int(urlID)))
 		return nil
 	})
+	router.Post("/urls/get-random-slug", utils.RateLimiterConfig{Max: 5, Expiration: time.Minute}.Middleware(), func(ctx *fiber.Ctx) error {
+		cancel, handleError := utils.SetExecutionTimeOut(ctx, time.Second*12)
+		defer cancel()
+		response := utils.ResponseType[models.GetRandomSlugResponse]{}
 
+		slug, err := urlService.GetRandomSlug(ctx.Context())
+		if err.IsNotEmpty() {
+			return handleError(appErrors.ErrGeneralServerError.Error())
+		}
+		response.Fill(models.GetRandomSlugResponse{Slug: slug})
+
+		return response.SendCtx(ctx)
+	})
+
+	// authenticated routes
+	urlRouter.Use(authHandlers.PrivateRouteMiddleware)
 	urlRouter.Post("/create", func(ctx *fiber.Ctx) error {
 		cancel, handleError := utils.SetExecutionTimeOut(ctx, time.Second*12)
 		defer cancel()
