@@ -43,9 +43,7 @@ func StartServer(a *fiber.App) {
 	// Build Fiber connection URL.
 	fiberConnURL, _ := ConnectionURLBuilder("fiber")
 
-	// Run server.
-
-	if err := a.ListenTLS(fiberConnURL, "./certs/ass.crt", "./certs/ass.key"); err != nil {
+	if err := a.ListenTLS(fiberConnURL, "./certs/DevModeSSL.crt", "./certs/DevModeSSL.key"); err != nil {
 		sLog.Error().Msgf("Oops... Server is not running! Reason: %v", err)
 	}
 }
