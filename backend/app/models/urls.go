@@ -24,3 +24,7 @@ type DeleteUrlRequest struct {
 	ID string `json:"id" validate:"required,uuid"`
 }
 type GetAllUrlsResponse []UrlResponse
+
+type GetRandomSlugResponse struct {
+	Slug string `json:"slug"`
+}
