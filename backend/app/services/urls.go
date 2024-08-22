@@ -504,6 +504,15 @@ func (s *UrlService) handleUrlPropsChange(ctx context.Context, row dbQueries.Get
 	}
 }
 
+func (s *UrlService) GetRandomSlug(ctx context.Context) (string, appErrors.ServerError) {
+	slug, err := s.DB.AppQueries.CreateRandomSlug(ctx)
+	if err != nil {
+		s.Logger.Error().Err(err).Msg("Error while creating random slug")
+		return "", appErrors.ErrGeneralServerError.ServerError()
+	}
+	return slug, appErrors.EmptyServerErr()
+}
+
 func fetchAndParsePageWithUserAgent(ctx context.Context, targetUrl, userAgent string, resChan chan pageResultChan) {
 	httpClient := http.Client{}
 	result := pageResultChan{
