@@ -2,24 +2,41 @@ package utils
 
 import (
 	"encoding/json"
-	appErrors "github.com/create-go-app/fiber-go-template/pkg/errors"
-	sLog "github.com/create-go-app/fiber-go-template/platform/logger/serverLogger"
+	"errors"
+	"github.com/gofiber/fiber/v2"
 )
 
-type ResponseType struct {
-	Data interface{} `json:"data"`
+type ResponseType[T comparable] struct {
+	Data T `json:"data"`
 }
 
-func (t ResponseType) ToJson() string {
-	jsonData, err := json.Marshal(t.Data)
-	if err != nil {
-		sLog.Error().Err(err).Msg("Error while marshalling response")
-		return Response(appErrors.ErrGeneralServerError).ToJson()
-	}
-	return string(jsonData)
+func (r *ResponseType[T]) Fill(data T) {
+	r.Data = data
 }
-func Response(data interface{}) ResponseType {
-	return ResponseType{
+
+func (r *ResponseType[T]) SendCtx(ctx *fiber.Ctx, optionalStatus ...int) error {
+	status := 200
+	if len(optionalStatus) > 0 && optionalStatus[0] > 0 {
+		status = optionalStatus[0]
+	}
+
+	return ctx.Status(status).JSON(r)
+}
+func (r *ResponseType[T]) JSON() (string, error) {
+	var zeroValue T
+	if r.Data == zeroValue {
+		return "", errors.New("error: ResponseType.Data is nil")
+	}
+
+	jsonBytes, err := json.Marshal(r)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+func CreateResponseType[T comparable](data T) ResponseType[T] {
+	return ResponseType[T]{
 		Data: data,
 	}
 }
