@@ -1,22 +1,24 @@
 ---
 import GlobalLayout from "../layouts/GlobalLayout.astro";
+import MainLanding from "src/components/Pages/Landings/Main";
 ---
 
 <GlobalLayout title="URL Shortner">
-    <h1 class="text-3xl text-center w-full mt-40 text-blue-700">
-        This is landing page
-    </h1>
+    <MainLanding  client:load />
+    <!--<h1 class="text-3xl text-center w-full mt-40 text-blue-700">-->
+    <!--    This is landing page-->
+    <!--</h1>-->
 
-    <div class="w-full flex flex-1 items-center flex-row gap-2 justify-center mt-40">
-        <a href="/auth/login" class="text-xl">
-            LOGIN
-        </a>
-        <a href="/auth/register" class="text-xl">
-            REGISTER
-        </a>
-        <a href="/panel" class="text-xl">
-            PANEL
-        </a>
-    </div>
+    <!--<div class="w-full flex flex-1 items-center flex-row gap-2 justify-center mt-40">-->
+    <!--    <a href="/auth/login" class="text-xl">-->
+    <!--        LOGIN-->
+    <!--    </a>-->
+    <!--    <a href="/auth/register" class="text-xl">-->
+    <!--        REGISTER-->
+    <!--    </a>-->
+    <!--    <a href="/panel" class="text-xl">-->
+    <!--        PANEL-->
+    <!--    </a>-->
+    <!--</div>-->
 </GlobalLayout>
 
