@@ -5,29 +5,29 @@ import React from "react";
 // ----------------------------------------------------------------------
 
 type RHFSelectProps = {
-   label: string;
-   name: string;
-   defaultValue?: any;
-   native?: boolean;
-   maxHeight?: boolean | number;
-   children: React.ReactNode[];
+	label: string;
+	name: string;
+	defaultValue?: any;
+	native?: boolean;
+	maxHeight?: boolean | number;
+	children: React.ReactNode[];
 };
 
 export function RHFSelect({ name, label, children, defaultValue }: RHFSelectProps) {
-   const { control } = useFormContext();
+	const { control } = useFormContext();
 
-   return (
-      <Controller
-         name={name}
-         control={control}
-         render={({ field, fieldState: { error } }) => (
-            <Select defaultValue={defaultValue} {...field}>
-               <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={label} />
-               </SelectTrigger>
-               <SelectContent>{children}</SelectContent>
-            </Select>
-         )}
-      />
-   );
+	return (
+		<Controller
+			name={name}
+			control={control}
+			render={({ field, fieldState: { error } }) => (
+				<Select defaultValue={defaultValue} {...field}>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder={label} />
+					</SelectTrigger>
+					<SelectContent>{children}</SelectContent>
+				</Select>
+			)}
+		/>
+	);
 }
