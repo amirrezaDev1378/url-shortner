@@ -7,8 +7,8 @@ import { Button } from "@UI/button.tsx";
 
 const MainLanding: FC = () => {
 	return (
-		<div>
-			<div className="h-[100svh] w-full rounded-md flex md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
+		<div className={"snap-y snap-mandatory"}>
+			<div className="snap-center h-[100svh] w-full rounded-md flex md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
 				<Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
 				<div className="h-[40rem] flex justify-center items-center px-4">
 					<div className="text-4xl mx-auto font-normal text-neutral-600 dark:text-neutral-400">
@@ -18,7 +18,11 @@ const MainLanding: FC = () => {
 					</div>
 				</div>
 			</div>
-			<AuroraBackground>
+			<AuroraBackground
+				containerProps={{
+					className: "snap-center",
+				}}
+			>
 				<motion.div
 					initial={{ opacity: 0.0, y: 40 }}
 					whileInView={{ opacity: 1, y: 0 }}
