@@ -5,11 +5,18 @@ import React, { type ReactNode } from "react";
 interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
 	children: ReactNode;
 	showRadialGradient?: boolean;
+	containerProps?: React.HTMLProps<HTMLDivElement>;
 }
 
-export const AuroraBackground = ({ className, children, showRadialGradient = true, ...props }: AuroraBackgroundProps) => {
+export const AuroraBackground = ({
+	className,
+	children,
+	showRadialGradient = true,
+	containerProps = {},
+	...props
+}: AuroraBackgroundProps) => {
 	return (
-		<main>
+		<main {...containerProps}>
 			<div
 				className={cn(
 					"relative flex flex-col  h-[100vh] items-center justify-center bg-zinc-50 dark:bg-zinc-900  text-slate-950 transition-bg",
