@@ -64,3 +64,7 @@ migrations.status:
 
 temp-run-fe:
 	cd ../frontend && bun dev
+
+
+temp-front-code-gen:
+	tygo generate
