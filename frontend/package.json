@@ -26,7 +26,7 @@
 		"@tanstack/react-table": "^8.20.1",
 		"@types/react": "^18.3.4",
 		"@types/react-dom": "^18.3.0",
-		"astro": "^4.14.5",
+		"astro": "4.8.7",
 		"axios": "^1.7.4",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
