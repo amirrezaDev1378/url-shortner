@@ -64,7 +64,6 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 				String: payload.IosRedirectPath,
 			},
 			GeneralRedirectPath: payload.GeneralRedirectPath,
-			Slug:                payload.Slug,
 			ExpiresAt:           expiresAt,
 		})
 
@@ -80,19 +79,6 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		}
 		ctx.Status(201).SendString(strconv.Itoa(int(urlID)))
 		return nil
-	})
-	router.Post("/urls/get-random-slug", utils.RateLimiterConfig{Max: 5, Expiration: time.Minute}.Middleware(), func(ctx *fiber.Ctx) error {
-		cancel, handleError := utils.SetExecutionTimeOut(ctx, time.Second*12)
-		defer cancel()
-		response := utils.ResponseType[models.GetRandomSlugResponse]{}
-
-		slug, err := urlService.GetRandomSlug(ctx.Context())
-		if err.IsNotEmpty() {
-			return handleError(appErrors.ErrGeneralServerError.Error())
-		}
-		response.Fill(models.GetRandomSlugResponse{Slug: slug})
-
-		return response.SendCtx(ctx)
 	})
 
 	// authenticated routes
@@ -131,7 +117,6 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 				String: payload.IosRedirectPath,
 			},
 			GeneralRedirectPath: payload.GeneralRedirectPath,
-			Slug:                payload.Slug,
 			ExpiresAt:           expiresAt,
 		})
 

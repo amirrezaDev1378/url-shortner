@@ -61,9 +61,10 @@ const (
 )
 
 func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlParams) (int32, error) {
-	if (params.Type == "direct" && params.Slug[0] != 'd') || (params.Type == "static" && params.Slug[0] != 's') {
-		return 0, appErrors.ErrInvalidPayload.Error()
-	}
+	// TODO add this feature for static urls again
+	//if (params.Type == "direct" && params.Slug[0] != 'd') || (params.Type == "static" && params.Slug[0] != 's') {
+	//	return 0, appErrors.ErrInvalidPayload.Error()
+	//}
 
 	tx, err := s.DB.DBPool.Begin(ctx)
 	if err != nil {
@@ -75,13 +76,13 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 
 	qtx := s.DB.AppQueries.WithTx(tx)
 
-	urlID, err := qtx.CreateUrl(ctx, *params)
+	createResult, err := qtx.CreateUrl(ctx, *params)
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while running create url query")
 		return 0, err
 	}
 	if params.Type == "direct" {
-		err := s.setDirectUrlInRedis(ctx, params.Slug, UrlRedirectPathsData{
+		err := s.setDirectUrlInRedis(ctx, createResult.Slug, UrlRedirectPathsData{
 			GeneralRedirectPath: params.GeneralRedirectPath,
 			IosRedirectPath:     params.IosRedirectPath.String,
 		}, params.ExpiresAt.Time)
@@ -91,7 +92,7 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 		}
 	}
 	if params.Type == "static" {
-		err = s.createStaticURL(ctx, qtx, urlID, params)
+		err = s.createStaticURL(ctx, qtx, createResult.ID, createResult.Slug, params)
 		if err != nil {
 			s.Logger.Error().Err(err).Msg("Error while running create static url query")
 			return 0, err
@@ -102,7 +103,7 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 		s.Logger.Error().Err(err).Msg("Error while committing transaction")
 		return 0, err
 	}
-	return urlID, nil
+	return createResult.ID, nil
 }
 
 func (s *UrlService) DeleteUrlByID(ctx context.Context, userID interface{}, urlID string) appErrors.ServerError {
@@ -303,7 +304,7 @@ func (s *UrlService) getStaticUrlContent(ctx context.Context, slug, deviceType s
 	}
 	return content, nil
 }
-func (s *UrlService) createStaticURL(ctx context.Context, qtx *dbQueries.Queries, urlID int32, params *dbQueries.CreateUrlParams) error {
+func (s *UrlService) createStaticURL(ctx context.Context, qtx *dbQueries.Queries, urlID int32, slug string, params *dbQueries.CreateUrlParams) error {
 	iosPageContent := ""
 	generalPageContent := ""
 	resultChan := make(chan pageResultChan)
@@ -360,10 +361,10 @@ func (s *UrlService) createStaticURL(ctx context.Context, qtx *dbQueries.Queries
 		return err
 	}
 
-	if err := s.setStaticUrlInRedis(ctx, params.Slug, generalDeviceType, generalPageContent, params.ExpiresAt.Time); err != nil {
+	if err := s.setStaticUrlInRedis(ctx, slug, generalDeviceType, generalPageContent, params.ExpiresAt.Time); err != nil {
 		return err
 	}
-	if err := s.setStaticUrlInRedis(ctx, params.Slug, iosDeviceType, iosPageContent, params.ExpiresAt.Time); err != nil {
+	if err := s.setStaticUrlInRedis(ctx, slug, iosDeviceType, iosPageContent, params.ExpiresAt.Time); err != nil {
 		return err
 	}
 
@@ -502,15 +503,6 @@ func (s *UrlService) handleUrlPropsChange(ctx context.Context, row dbQueries.Get
 		s.Logger.Error().Msg("Invalid url type")
 		return errors.New("invalid url type provided " + string(row.Type))
 	}
-}
-
-func (s *UrlService) GetRandomSlug(ctx context.Context) (string, appErrors.ServerError) {
-	slug, err := s.DB.AppQueries.CreateRandomSlug(ctx)
-	if err != nil {
-		s.Logger.Error().Err(err).Msg("Error while creating random slug")
-		return "", appErrors.ErrGeneralServerError.ServerError()
-	}
-	return slug, appErrors.EmptyServerErr()
 }
 
 func fetchAndParsePageWithUserAgent(ctx context.Context, targetUrl, userAgent string, resChan chan pageResultChan) {

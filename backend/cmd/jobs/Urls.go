@@ -43,12 +43,6 @@ func (c *Config) deleteExpiredUrlsJob() {
 					cancel()
 					return
 				}
-				err = qtx.DeleteExpiredTempSlugs(ctx)
-				if err != nil {
-					sLog.WithStackTrace(err).Send()
-					cancel()
-					return
-				}
 
 				err = tx.Commit(ctx)
 				if err != nil {

@@ -14,9 +14,8 @@ import (
 type ValidUrlTypes string
 
 const (
-	ValidUrlTypesDirect   ValidUrlTypes = "direct"
-	ValidUrlTypesStatic   ValidUrlTypes = "static"
-	ValidUrlTypesTempSlug ValidUrlTypes = "temp-slug"
+	ValidUrlTypesDirect ValidUrlTypes = "direct"
+	ValidUrlTypesStatic ValidUrlTypes = "static"
 )
 
 func (e *ValidUrlTypes) Scan(src interface{}) error {
