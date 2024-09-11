@@ -7,7 +7,8 @@
 		"build-and-check": "bun --bun astro check && bun run build",
 		"build": " bun --bun astro build",
 		"preview": "bun  astro preview",
-		"prepare": "cd .. && husky frontend/.husky"
+		"prepare": "cd .. && husky frontend/.husky",
+		"codegen": "cd ../backend && tygo generate"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.3",
@@ -22,6 +23,7 @@
 		"@radix-ui/react-label": "^2.1.0",
 		"@radix-ui/react-select": "^2.1.1",
 		"@radix-ui/react-slot": "^1.1.0",
+		"@radix-ui/react-tabs": "^1.1.0",
 		"@radix-ui/react-tooltip": "^1.1.2",
 		"@tanstack/react-table": "^8.20.1",
 		"@types/react": "^18.3.4",
