@@ -8,7 +8,8 @@
 		"build": " bun --bun astro build",
 		"preview": "bun  astro preview",
 		"prepare": "cd .. && husky frontend/.husky",
-		"codegen": "cd ../backend && tygo generate"
+		"codegen": "cd ../backend && tygo generate",
+		"temp-run-be": "wsl -e bash -c \"cd ../backend && make watch\""
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.3",
