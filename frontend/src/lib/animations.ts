@@ -1,6 +1,6 @@
 import { type Config } from "tailwindcss";
 
-const tailwindAnimations: Pick<Config["theme"], "animation" | "keyframes"> = {
+const tailwindAnimations: Pick<NonNullable<Config["theme"]>, "animation" | "keyframes"> = {
 	animation: {
 		spotlight: "spotlight 2s ease .75s 1 forwards",
 		"accordion-down": "accordion-down 0.2s ease-out",

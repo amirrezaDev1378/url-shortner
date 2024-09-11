@@ -39,7 +39,7 @@ export default function RHFTextInput({
 			render={({ field, fieldState }) => (
 				<FormItem {...wrapperProps}>
 					{label && (
-						<div className={"flex gap-2 flex-row items-center"}>
+						<div className={"flex flex-row items-center gap-2"}>
 							<FormLabel className={cn({ "opacity-60": other.disabled })}>{label}</FormLabel>
 							{helperText && (
 								<TooltipProvider>
@@ -71,7 +71,7 @@ export default function RHFTextInput({
 						/>
 					</FormControl>
 					{description && <FormDescription>{description}</FormDescription>}
-					{!hideFormMessages && <FormMessage shouldAnimate={animateError} />}
+					{!hideFormMessages && <FormMessage shouldAnimate={!!animateError} />}
 				</FormItem>
 			)}
 		/>

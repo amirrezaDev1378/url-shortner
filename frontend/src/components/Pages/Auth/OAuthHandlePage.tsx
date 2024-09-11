@@ -1,9 +1,10 @@
 import React, { type FC, useEffect, useState } from "react";
 import { handleOAuthLogin } from "@/services/auth.ts";
 import axios from "axios";
+import type { TODO_TYPE } from "@/models/utils.ts";
 
 const OAuthHandlePage: FC = () => {
-	const [handlingState, setHandlingState] = useState(null);
+	const [handlingState, setHandlingState] = useState<TODO_TYPE>(null);
 
 	useEffect(() => {
 		if (!handlingState) setHandlingState("loading");
@@ -15,6 +16,7 @@ const OAuthHandlePage: FC = () => {
 		const state = url.searchParams.get("state");
 		if (error) return setHandlingState("error");
 		if (!code || !state) return setHandlingState("error_no_state_or_code");
+		if (!provider) return setHandlingState("error_no_provider");
 		handleOAuthLogin({
 			provider,
 			code,

@@ -75,7 +75,7 @@ const AnalyticUrlsByLocation: FC = () => {
 				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
-						data.map((i) => (
+						data.map((i: any) => (
 							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>
@@ -95,7 +95,12 @@ const AnalyticsUrlsByDevice: FC = () => {
 		<div>
 			<header className={"mb-4 flex w-full flex-row items-center justify-between gap-12"}>
 				<p>Device</p>
-				<AnimatedTabs containerClassName={"w-fit"} onTabChange={setDevice} tabs={analyticsByDeviceTabs} />
+				<AnimatedTabs
+					containerClassName={"w-fit"}
+					activeTab={analyticsByDeviceTabs.find((i) => i.value === device) as Tab}
+					setActiveTab={(tab) => setDevice(tab.value)}
+					tabs={analyticsByDeviceTabs}
+				/>
 			</header>
 			<div className={"flex flex-col items-center"}>
 				{loading && (
@@ -109,7 +114,7 @@ const AnalyticsUrlsByDevice: FC = () => {
 				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
-						data.map((i) => (
+						data.map((i: any) => (
 							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>
@@ -140,7 +145,7 @@ const TopUrlsAnalytics: FC = () => {
 				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
-						data.map((i) => (
+						data.map((i: any) => (
 							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>

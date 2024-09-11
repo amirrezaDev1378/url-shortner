@@ -17,9 +17,9 @@ export const useAnalyticsByDevice = (device: "device" | "browser" | "OS") => {
 		OS: TopOSAnalytics,
 	};
 	const [data, setData] = useState({
-		data: null,
+		data: null as any,
 		loading: true,
-		error: null,
+		error: null as any,
 	});
 
 	useEffect(() => {
@@ -43,9 +43,9 @@ export const useAnalyticsByDevice = (device: "device" | "browser" | "OS") => {
 };
 export const useAnalyticsByLocation = (type: "country" | "city") => {
 	const [data, setData] = useState({
-		data: null,
+		data: null as any,
 		loading: true,
-		error: null,
+		error: null as any,
 	});
 	const mockDataByLocation = {
 		country: TopLocationsByCountry,
@@ -73,7 +73,7 @@ export const useAnalyticsByLocation = (type: "country" | "city") => {
 
 export const useTopLinkAnalytics = () => {
 	const [data, setData] = useState({
-		data: null,
+		data: null as any,
 		loading: true,
 		error: null,
 	});

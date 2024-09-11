@@ -8,7 +8,7 @@ const OAuthUI: FC = () => {
 
 	const handleProviderLogin = (provider: string) => () => {
 		requestOauthLink(provider).then(({ redirectUrl, error }) => {
-			if (error) return alert("Errr");
+			if (error || !redirectUrl) return alert("Errr");
 			window.open(redirectUrl, "_blank");
 		});
 	};

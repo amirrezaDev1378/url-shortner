@@ -25,7 +25,7 @@ const UrlTypes = [
 		disabled: true,
 	},
 ];
-type UrlComponentsType = { [key: string]: FC };
+type UrlComponentsType = { [key: string]: FC<any> };
 const UrlTypeComponents: UrlComponentsType = {
 	"with-page": CreateUrlWithPage,
 	standard: CreateStandardUrl,
@@ -33,9 +33,9 @@ const UrlTypeComponents: UrlComponentsType = {
 };
 
 const CreateUrlsPage: FC = () => {
-	const [activeCardMode, setActiveCardMode] = useState<keyof UrlComponentsType>(null);
+	const [activeCardMode, setActiveCardMode] = useState<keyof UrlComponentsType | null>(null);
 	const [showUnavailableModal, setShowUnavailableModal] = useState(false);
-	const UrlComponent = UrlTypeComponents[activeCardMode];
+	const UrlComponent = UrlTypeComponents[activeCardMode as keyof UrlComponentsType];
 	const onCardClick = (item: HoverCardItemType) => {
 		if (item.disabled) return setShowUnavailableModal(true);
 		if (activeCardMode !== item.id) setActiveCardMode(item.id);
@@ -44,20 +44,20 @@ const CreateUrlsPage: FC = () => {
 		if (activeCardMode !== null) setActiveCardMode(null);
 	};
 	return (
-		<div className={"flex flex-col justify-center items-center  w-full p-6"}>
-			<h3 className={"text-left text-3xl mt-5 w-full"}>Create A New Short Link.</h3>
+		<div className={"flex w-full flex-col items-center justify-center p-6"}>
+			<h3 className={"mt-5 w-full text-left text-3xl"}>Create A New Short Link.</h3>
 			<hr className={"my-4 w-full"} />
 
 			<AnimatePresence mode={"popLayout"}>
 				{!UrlComponent ? (
 					<motion.div
-						className={"w-full justify-center flex flex-col  items-center"}
+						className={"flex w-full flex-col items-center justify-center"}
 						key={"main-section"}
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 					>
-						<p className={"text-center text-xl mt-8"}>Please choose the type of link you want to create.</p>
+						<p className={"mt-8 text-center text-xl"}>Please choose the type of link you want to create.</p>
 						<CardHoverEffect onCardClick={onCardClick} className={"max-w-[80%] cursor-pointer"} items={UrlTypes} />
 					</motion.div>
 				) : (

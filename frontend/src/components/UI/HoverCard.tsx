@@ -13,7 +13,7 @@ export interface HoverCardItemType {
 
 interface HoverCardProps {
 	items: HoverCardItemType[];
-	onCardClick?: (item: HoverCardItemType, e: MouseEvent<HTMLAnchorElement>) => void;
+	onCardClick: (item: HoverCardItemType, e: MouseEvent<HTMLAnchorElement>) => void;
 	className?: string;
 }
 
@@ -21,13 +21,13 @@ export const CardHoverEffect = ({ items, className, onCardClick }: HoverCardProp
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
 	return (
-		<div className={cn("grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10", className)}>
+		<div className={cn("grid grid-cols-1 py-10 md:grid-cols-2 lg:grid-cols-3", className)}>
 			{items.map((item, idx) => (
 				<a
 					aria-disabled={item.disabled}
 					href={item?.link}
 					key={item?.id}
-					className={cn("relative group  block p-2 h-full w-full", { "cursor-not-allowed opacity-[50%]": item.disabled })}
+					className={cn("group relative block h-full w-full p-2", { "cursor-not-allowed opacity-[50%]": item.disabled })}
 					onMouseEnter={() => setHoveredIndex(idx)}
 					onMouseLeave={() => setHoveredIndex(null)}
 					onClick={(event) => onCardClick(item, event)}
@@ -35,7 +35,7 @@ export const CardHoverEffect = ({ items, className, onCardClick }: HoverCardProp
 					<AnimatePresence>
 						{hoveredIndex === idx && (
 							<motion.span
-								className="absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block  rounded-3xl"
+								className="absolute inset-0 block h-full w-full rounded-3xl bg-neutral-200 dark:bg-slate-800/[0.8]"
 								layoutId="hoverBackground"
 								initial={{ opacity: 0 }}
 								animate={{
@@ -63,7 +63,7 @@ export const Card = ({ className, children }: { className?: string; children: Re
 	return (
 		<div
 			className={cn(
-				"rounded-2xl h-full w-full p-4 overflow-hidden bg-black border border-transparent dark:border-white/[0.2] group-hover:border-slate-700 relative z-20",
+				"relative z-20 h-full w-full overflow-hidden rounded-2xl border border-transparent bg-black p-4 group-hover:border-slate-700 dark:border-white/[0.2]",
 				className
 			)}
 		>
@@ -74,8 +74,8 @@ export const Card = ({ className, children }: { className?: string; children: Re
 	);
 };
 export const CardTitle = ({ className, children }: { className?: string; children: ReactNode }) => {
-	return <h4 className={cn("text-zinc-100 font-bold tracking-wide mt-4", className)}>{children}</h4>;
+	return <h4 className={cn("mt-4 font-bold tracking-wide text-zinc-100", className)}>{children}</h4>;
 };
 export const CardDescription = ({ className, children }: { className?: string; children: ReactNode }) => {
-	return <p className={cn("mt-8 text-zinc-400 tracking-wide leading-relaxed text-sm", className)}>{children}</p>;
+	return <p className={cn("mt-8 text-sm leading-relaxed tracking-wide text-zinc-400", className)}>{children}</p>;
 };
