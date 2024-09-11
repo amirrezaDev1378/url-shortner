@@ -20,11 +20,11 @@ const AnalyticUrlsTotalClick: FC = () => {
 	const { data, loading, error } = useTotalClicksAnalytics();
 	return (
 		<div>
-			<header className={"flex flex-row items-center gap-12 w-full justify-between mb-4"}>
+			<header className={"mb-4 flex w-full flex-row items-center justify-between gap-12"}>
 				<p>Total Clicks</p>
 			</header>
 			<AnimatePresence>
-				{loading && <Skeleton className={"w-full rounded-2xl min-h-[300px]"} />}
+				{loading && <Skeleton className={"min-h-[300px] w-full rounded-2xl"} />}
 				{!loading && data && (
 					<ResponsiveContainer width={"100%"} height={"100%"} className={"min-h-[300px]"}>
 						<LineChart data={data} width={500} height={300}>
@@ -53,25 +53,30 @@ const AnalyticUrlsByLocation: FC = () => {
 
 	const { data, loading, error } = useAnalyticsByLocation(type);
 	return (
-		<div className={"flex-col flex"}>
-			<header className={"flex flex-row items-center gap-12 justify-between w-full mb-4"}>
+		<div className={"flex flex-col"}>
+			<header className={"mb-4 flex w-full flex-row items-center justify-between gap-12"}>
 				<p>Location</p>
-				<AnimatedTabs containerClassName={"w-fit"} onTabChange={setType} tabs={analyticsByLocationTabs} />
+				<AnimatedTabs
+					containerClassName={"w-fit"}
+					setActiveTab={(tab) => setType(tab.value)}
+					activeTab={analyticsByLocationTabs.find((i) => i.value === type) as Tab}
+					tabs={analyticsByLocationTabs}
+				/>
 			</header>
-			<div className={"flex-col flex items-center"}>
+			<div className={"flex flex-col items-center"}>
 				{loading && (
-					<div className={"w-[300px] flex flex-col gap-4 items-center"}>
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
+					<div className={"flex w-[300px] flex-col items-center gap-4"}>
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
 					</div>
 				)}
-				<div className={"w-[300px] max-h-[300px] overflow-y-auto"}>
+				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
 						data.map((i) => (
-							<div className={"flex flex-row justify-between w-full rounded mb-2 items-center p-4 border  border-gray-500 "} key={i}>
+							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>
 							</div>
@@ -88,24 +93,24 @@ const AnalyticsUrlsByDevice: FC = () => {
 	const { data, loading, error } = useAnalyticsByDevice(device);
 	return (
 		<div>
-			<header className={"flex flex-row items-center gap-12 w-full justify-between mb-4"}>
+			<header className={"mb-4 flex w-full flex-row items-center justify-between gap-12"}>
 				<p>Device</p>
 				<AnimatedTabs containerClassName={"w-fit"} onTabChange={setDevice} tabs={analyticsByDeviceTabs} />
 			</header>
-			<div className={"flex-col flex items-center"}>
+			<div className={"flex flex-col items-center"}>
 				{loading && (
-					<div className={"w-[300px] flex flex-col gap-4 items-center"}>
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
+					<div className={"flex w-[300px] flex-col items-center gap-4"}>
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
 					</div>
 				)}
-				<div className={"w-[300px] max-h-[300px] overflow-y-auto"}>
+				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
 						data.map((i) => (
-							<div className={"flex flex-row justify-between w-full rounded mb-2 items-center p-4 border  border-gray-500 "} key={i}>
+							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>
 							</div>
@@ -120,23 +125,23 @@ const TopUrlsAnalytics: FC = () => {
 	const { loading, error, data } = useTopLinkAnalytics();
 	return (
 		<div>
-			<header className={"flex flex-row items-center gap-12 w-full justify-between mb-4"}>
+			<header className={"mb-4 flex w-full flex-row items-center justify-between gap-12"}>
 				<p>Top Links</p>
 			</header>
-			<div className={"flex-col flex items-center"}>
+			<div className={"flex flex-col items-center"}>
 				{loading && (
-					<div className={"w-[300px] flex flex-col gap-4 items-center"}>
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
-						<Skeleton className={"w-full h-[30px]"} />
+					<div className={"flex w-[300px] flex-col items-center gap-4"}>
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
+						<Skeleton className={"h-[30px] w-full"} />
 					</div>
 				)}
-				<div className={"w-[300px] max-h-[300px] overflow-y-auto"}>
+				<div className={"max-h-[300px] w-[300px] overflow-y-auto"}>
 					{!loading &&
 						data?.length &&
 						data.map((i) => (
-							<div className={"flex flex-row justify-between w-full rounded mb-2 items-center p-4 border  border-gray-500 "} key={i}>
+							<div className={"mb-2 flex w-full flex-row items-center justify-between rounded border border-gray-500 p-4"} key={i}>
 								<p>{i.label}</p>
 								<span>{i.value}</span>
 							</div>
