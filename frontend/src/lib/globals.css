@@ -72,13 +72,14 @@
 		@apply border-border;
 	}
 
+	html,
 	body {
-		@apply bg-background text-foreground;
+		@apply h-full w-full bg-background text-foreground;
 	}
 }
 
 @layer components {
 	.lightbox {
-		@apply absolute inset-0 backdrop-blur-3xl bg-neutral-900 opacity-90;
+		@apply absolute inset-0 bg-neutral-900 opacity-90 backdrop-blur-3xl;
 	}
 }
