@@ -119,7 +119,7 @@ const CreateTempUrl: FC<CreateTempUrlProps> = (props) => {
 						</motion.div>
 					)}
 				</AnimatePresence>
-				<div>
+				<div className={"flex flex-col gap-3"}>
 					<Label>Expiration</Label>
 					<AnimatedTabs activeTab={activeExpiration} setActiveTab={onExpirationChange} tabs={ExpirationOptionsTab} />
 				</div>
