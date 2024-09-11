@@ -1,3 +1,9 @@
-<div>
-	Hi there why did u not sign in booooo::::
-</div>
+---
+import { CreateStandardUrl } from "src/components/Pages/Panel/components/CreateUrlComponents";
+import GlobalLayout from "src/layouts/GlobalLayout.astro";
+import TempUrlsPage from "src/components/Pages/TempURLs/IndexPage";
+---
+
+<GlobalLayout title="Create a new short url">
+	<TempUrlsPage client:load />
+</GlobalLayout>
