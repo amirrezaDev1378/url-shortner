@@ -7,6 +7,7 @@ import { Label } from "@UI/label.tsx";
 import { Checkbox } from "@UI/checkbox.tsx";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { CreateUrlRequest } from "@/models/generated.ts";
 
 const CreateUrlWithPage: FC = () => {
 	return <div></div>;
@@ -15,12 +16,14 @@ const CreateUrlWithProxy: FC = () => {
 	return <div></div>;
 };
 
-const CreateStandardUrl: FC = () => {
+type CreateStandardUrlProps = {
+	onSubmit: (data: CreateUrlRequest) => void;
+};
+
+const CreateStandardUrl: FC<CreateStandardUrlProps> = ({ onSubmit }) => {
 	const standardUrlSchema = z.strictObject({
-		name: z.string().trim().min(1),
-		destination: z.string().trim().min(1).url(),
 		slug: z.string().trim().min(1),
-		"ios-destination": z
+		ios_redirect_path: z
 			.string()
 			.trim()
 			.min(1)
@@ -28,7 +31,7 @@ const CreateStandardUrl: FC = () => {
 			.optional()
 			.or(z.literal(""))
 			.refine((r) => (customDevicesState.ios ? !!r : true), { message: "Provide ios link" }),
-		"android-destination": z
+		general_redirect_path: z
 			.string()
 			.trim()
 			.min(1)
@@ -42,10 +45,8 @@ const CreateStandardUrl: FC = () => {
 		mode: "all",
 		defaultValues: {
 			slug: "",
-			name: "",
-			destination: "",
-			"android-destination": "",
-			"ios-destination": "",
+			general_redirect_path: "",
+			ios_redirect_path: "",
 		},
 	});
 	const {
@@ -58,18 +59,29 @@ const CreateStandardUrl: FC = () => {
 		ios: false,
 		android: false,
 	});
-	const toggleCustomDevice = (type: "ios" | "android") => () => setCustomDevicesState((p) => ({ ...p, [type]: !p[type] }));
+	const toggleCustomDevice = (type: "ios" | "android") => () =>
+		setCustomDevicesState((p) => ({
+			...p,
+			[type]: !p[type],
+		}));
 
 	useEffect(() => {
-		trigger("ios-destination");
-		trigger("android-destination");
+		trigger("ios_redirect_path");
+		trigger("general_redirect_path");
 	}, [customDevicesState]);
-	const onFormSubmit = handleSubmit((data) => {});
+	const onFormSubmit = handleSubmit((data) =>
+		onSubmit({
+			general_redirect_path: data.general_redirect_path as string,
+			ios_redirect_path: data.ios_redirect_path as string,
+			type: "direct",
+			expiration: "never",
+		})
+	);
 
 	return (
-		<AppFormProvider onSubmit={onFormSubmit} className={"w-full flex flex-col items-center"} methods={methods}>
-			<div className={"w-[50%] flex-wrap flex flex-col gap-6  border-neutral-700 border-2 border-solid rounded-xl p-6 "}>
-				<h4 className={"text-center text-4xl mb-2"}>Standard URL</h4>
+		<AppFormProvider onSubmit={onFormSubmit} className={"flex w-full flex-col items-center"} methods={methods}>
+			<div className={"flex w-[50%] flex-col flex-wrap gap-6 rounded-xl border-2 border-solid border-neutral-700 p-6"}>
+				<h4 className={"mb-2 text-center text-4xl"}>Standard URL</h4>
 
 				<RHFTextInput
 					helperText={"Enter a name for your link, this will not be shown to anyone, it's just for your self"}
@@ -79,10 +91,10 @@ const CreateStandardUrl: FC = () => {
 					label={"name"}
 				/>
 				<RHFTextInput animatedInput animateError name={"destination"} label={"Destination URL"} />
-				<div className={"flex flex-col items-start w-full"}>
+				<div className={"flex w-full flex-col items-start"}>
 					<Label className={"pb-1"}>Slug</Label>
-					<div className={"flex flex-row items-end gap-6 w-full"}>
-						<p className={"text-3xl pb-1"}>{import.meta.env.PUBLIC_URLS_DOMAIN} /</p>
+					<div className={"flex w-full flex-row items-end gap-6"}>
+						<p className={"pb-1 text-3xl"}>{import.meta.env.PUBLIC_URLS_DOMAIN} /</p>
 						<RHFTextInput
 							hideFormMessages
 							animatedInput
@@ -91,10 +103,10 @@ const CreateStandardUrl: FC = () => {
 							placeholder={"slug"}
 							wrapperProps={{ className: "flex-1" }}
 						/>
-						<Button className={"h-[40px] m-[2px]"}>Generate Link</Button>
+						<Button className={"m-[2px] h-[40px]"}>Generate Link</Button>
 					</div>
 				</div>
-				<div className={"flex flex-row gap-6 items-center w-full justify-between"}>
+				<div className={"flex w-full flex-row items-center justify-between gap-6"}>
 					<RHFTextInput
 						wrapperProps={{ className: "flex-1" }}
 						disabled={!customDevicesState.ios}
@@ -106,7 +118,7 @@ const CreateStandardUrl: FC = () => {
 					/>
 					<Checkbox className={"mb-2"} checked={customDevicesState.ios} onClick={toggleCustomDevice("ios")} />
 				</div>
-				<div className={"flex flex-row gap-6 items-center w-full justify-between"}>
+				<div className={"flex w-full flex-row items-center justify-between gap-6"}>
 					<RHFTextInput
 						wrapperProps={{ className: "flex-1" }}
 						disabled={!customDevicesState.android}
