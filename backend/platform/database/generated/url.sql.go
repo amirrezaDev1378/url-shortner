@@ -29,8 +29,13 @@ func (q *Queries) CreateStaticUrl(ctx context.Context, arg CreateStaticUrlParams
 
 const createUrl = `-- name: CreateUrl :one
 INSERT INTO urls (slug, created_by, general_redirect_path, ios_redirect_path, type, expires_at)
-VALUES ((SELECT base62_encode(COUNT(*)) FROM urls), $1, $2, $3, $4, $5)
-RETURNING id , slug
+VALUES ((CASE
+             WHEN $4::valid_url_types = 'direct' THEN 'd' || (SELECT base62_encode(COUNT(*)) FROM urls)
+             WHEN $4::valid_url_types = 'static' THEN 's' || (SELECT base62_encode(COUNT(*)) FROM urls)
+             ELSE NULL
+    END),
+        $1, $2, $3, $4, $5)
+RETURNING id, slug
 `
 
 type CreateUrlParams struct {

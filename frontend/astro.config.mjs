@@ -6,10 +6,10 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 // https://astro.build/config
 export default defineConfig({
 	vite: {
-		plugins: [basicSsl()],
+		// plugins: [basicSsl()], // bun does not support this yet
 	},
 	server: {
-		https: true,
+		https: false, // bun does not support this yet
 		host: "0.0.0.0",
 	},
 	prefetch: true,

@@ -1,30 +1,32 @@
 ---
 import "@/lib/globals.css";
-import {ViewTransitions} from "astro:transitions";
+import { ViewTransitions } from "astro:transitions";
+import Toaster from "src/components/UI/toaster";
 interface Props {
-    title: string;
+	title: string;
 }
 
-const {title} = Astro.props;
+const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="description" content="Astro description"/>
-    <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-    <!-- TODO: -check if this can cause any problem -->
-    <ViewTransitions/>
-    <!--<link rel="stylesheet" href="globals.css" />-->
-    <meta name="generator" content={Astro.generator}/>
-    <title>
-        {title || "url shorter"}
-    </title>
-</head>
-<body class="dark bg-background">
-<slot/>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- TODO: -check if this can cause any problem -->
+		<ViewTransitions />
+		<!--<link rel="stylesheet" href="globals.css" />-->
+		<meta name="generator" content={Astro.generator} />
+		<title>
+			{title || "url shorter"}
+		</title>
+	</head>
+	<!--<Toaster client:load />-->
+	<body class="dark bg-background">
+		<slot />
+		<Toaster client:load />
+	</body>
 </html>
-

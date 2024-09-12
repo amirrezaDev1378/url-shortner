@@ -38,7 +38,7 @@ test: clean critic security lint
 
 debugger:
 	# --only-same-user=false is not safe it's just for WSL2
-	dlv debug --headless --listen=127.0.0.1:2345 --api-version=2 --accept-multiclient --only-same-user=false cmd/main.go
+	dlv debug --headless --check-go-version=false --listen=127.0.0.1:2345 --api-version=2 --accept-multiclient --only-same-user=false cmd/main.go
 
 watch:
 	redis-server --daemonize yes

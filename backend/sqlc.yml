@@ -2,7 +2,7 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries:
-      - "platform/database/queries"
+      #      - "platform/database/queries"
       - "platform/auth/queries"
       - "app/queries"
     schema: "platform/database/migrations"

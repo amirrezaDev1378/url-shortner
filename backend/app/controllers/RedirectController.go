@@ -28,14 +28,14 @@ func RedirectController(app *fiber.App, db *database.Params, redisClients cache.
 		if err != nil {
 			return err
 		}
-		c.Set("Cache-Control", "public, max-age=31536000") // 1 year in seconds
+		c.Set("Cache-Control", "public, max-age=86400") // 1 day in seconds //TODO add expiry
 		if slug.IosRedirectPath != "" {
 			UA := c.Get("User-Agent")
 			if strings.Contains(UA, "iPhone") || strings.Contains(UA, "iPad") {
-				return c.Redirect(slug.IosRedirectPath, fiber.StatusMovedPermanently)
+				return c.Redirect(slug.IosRedirectPath, fiber.StatusFound)
 			}
 		}
-		return c.Redirect(slug.GeneralRedirectPath, fiber.StatusMovedPermanently)
+		return c.Redirect(slug.GeneralRedirectPath, fiber.StatusFound)
 	})
 
 	// static redirect
