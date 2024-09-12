@@ -30,3 +30,8 @@ export type GetAllUrlsResponse = UrlResponse[];
 export interface GetRandomSlugResponse {
 	slug: string;
 }
+export interface CreateUrlResponse {
+	id: number /* int32 */;
+	slug: string;
+	expiration: string;
+}
