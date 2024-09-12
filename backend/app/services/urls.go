@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/create-go-app/fiber-go-template/app/models"
 	appErrors "github.com/create-go-app/fiber-go-template/pkg/errors"
 	"github.com/create-go-app/fiber-go-template/pkg/utils"
 	"github.com/create-go-app/fiber-go-template/platform/cache"
@@ -60,16 +61,16 @@ const (
 	generalDeviceType = "general"
 )
 
-func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlParams) (int32, error) {
+func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlParams) (models.CreateUrlResponse, error) {
 	// TODO add this feature for static urls again
 	//if (params.Type == "direct" && params.Slug[0] != 'd') || (params.Type == "static" && params.Slug[0] != 's') {
 	//	return 0, appErrors.ErrInvalidPayload.Error()
 	//}
-
+	response := models.CreateUrlResponse{}
 	tx, err := s.DB.DBPool.Begin(ctx)
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while creating transaction")
-		return 0, err
+		return response, err
 	}
 
 	defer tx.Rollback(ctx)
@@ -79,7 +80,7 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 	createResult, err := qtx.CreateUrl(ctx, *params)
 	if err != nil {
 		s.Logger.Error().Err(err).Msg("Error while running create url query")
-		return 0, err
+		return response, err
 	}
 	if params.Type == "direct" {
 		err := s.setDirectUrlInRedis(ctx, createResult.Slug, UrlRedirectPathsData{
@@ -88,22 +89,25 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 		}, params.ExpiresAt.Time)
 		if err != nil {
 			s.Logger.Error().Err(err).Msg("Error while setting direct url in redis")
-			return 0, err
+			return response, err
 		}
 	}
 	if params.Type == "static" {
 		err = s.createStaticURL(ctx, qtx, createResult.ID, createResult.Slug, params)
 		if err != nil {
 			s.Logger.Error().Err(err).Msg("Error while running create static url query")
-			return 0, err
+			return response, err
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		s.Logger.Error().Err(err).Msg("Error while committing transaction")
-		return 0, err
+		return response, err
 	}
-	return createResult.ID, nil
+	response.Slug = createResult.Slug
+	response.ID = createResult.ID
+	response.Expiration = params.ExpiresAt.Time.String()
+	return response, nil
 }
 
 func (s *UrlService) DeleteUrlByID(ctx context.Context, userID interface{}, urlID string) appErrors.ServerError {

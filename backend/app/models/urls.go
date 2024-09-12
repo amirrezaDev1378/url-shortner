@@ -33,3 +33,9 @@ type GetAllUrlsResponse []UrlResponse
 type GetRandomSlugResponse struct {
 	Slug string `json:"slug"`
 }
+
+type CreateUrlResponse struct {
+	ID         int32  `json:"id" validate:"required,uuid"`
+	Slug       string `json:"slug" validate:"required,url"`
+	Expiration string `json:"expiration" validate:"omitempty,datetime=2006-01-02T15:04:05Z07:00"`
+}

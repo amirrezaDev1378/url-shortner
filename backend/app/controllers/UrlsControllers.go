@@ -13,7 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgtype"
-	"strconv"
 	"time"
 )
 
@@ -56,7 +55,7 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 			return handleError(appErrors.ErrInvalidPayload.SendCtx(ctx))
 		}
 
-		urlID, err := urlService.CreateURl(ctx.UserContext(), &dbQueries.CreateUrlParams{
+		createdUrl, err := urlService.CreateURl(ctx.UserContext(), &dbQueries.CreateUrlParams{
 			CreatedBy: pgtype.UUID{},
 			Type:      dbQueries.ValidUrlTypes(payload.Type),
 			IosRedirectPath: pgtype.Text{
@@ -77,7 +76,8 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 			logger.Error().Err(err).Msg("Error while creating url")
 			return appErrors.ErrGeneralServerError.Error()
 		}
-		ctx.Status(201).SendString(strconv.Itoa(int(urlID)))
+
+		ctx.Status(201).JSON(createdUrl)
 		return nil
 	})
 
@@ -109,7 +109,7 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 			}
 		}
 
-		urlID, err := urlService.CreateURl(ctx.UserContext(), &dbQueries.CreateUrlParams{
+		createdURl, err := urlService.CreateURl(ctx.UserContext(), &dbQueries.CreateUrlParams{
 			CreatedBy: userID,
 			Type:      dbQueries.ValidUrlTypes(payload.Type),
 			IosRedirectPath: pgtype.Text{
@@ -127,7 +127,7 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 			logger.Error().Err(err).Msg("Error while creating url")
 			return appErrors.ErrGeneralServerError.Error()
 		}
-		ctx.Status(201).SendString(strconv.Itoa(int(urlID)))
+		ctx.Status(201).JSON(createdURl)
 		return nil
 	})
 	urlRouter.Get("/get-all", func(ctx *fiber.Ctx) error {
