@@ -36,6 +36,7 @@ type DeviceTypes struct {
 type UrlRedirectPathsData struct {
 	GeneralRedirectPath string
 	IosRedirectPath     string
+	Expiry              time.Time
 }
 
 type StaticUrlContent struct {
@@ -86,7 +87,8 @@ func (s *UrlService) CreateURl(ctx context.Context, params *dbQueries.CreateUrlP
 		err := s.setDirectUrlInRedis(ctx, createResult.Slug, UrlRedirectPathsData{
 			GeneralRedirectPath: params.GeneralRedirectPath,
 			IosRedirectPath:     params.IosRedirectPath.String,
-		}, params.ExpiresAt.Time)
+			Expiry:              params.ExpiresAt.Time,
+		})
 		if err != nil {
 			s.Logger.Error().Err(err).Msg("Error while setting direct url in redis")
 			return response, err
@@ -268,6 +270,13 @@ func (s *UrlService) getUrlRedirectPaths(ctx context.Context, slug string) (UrlR
 	redirectPaths := UrlRedirectPathsData{}
 	redirectPaths.IosRedirectPath = s.Redis.DirectUrlClient.HGet(ctx, slug, iosRedirectPathRedisKey).Val()
 	redirectPaths.GeneralRedirectPath = s.Redis.DirectUrlClient.HGet(ctx, slug, generalRedirectPathRedisKey).Val()
+	redisExpiry, err := s.Redis.DirectUrlClient.HGet(ctx, slug, generalDeviceType).Time()
+
+	if err != nil {
+		return redirectPaths, err
+	}
+
+	redirectPaths.Expiry = redisExpiry
 
 	if redirectPaths.GeneralRedirectPath == "" {
 		urlRedirectPaths, err := s.DB.AppQueries.GetUrlBySlug(ctx, slug)
@@ -276,7 +285,9 @@ func (s *UrlService) getUrlRedirectPaths(ctx context.Context, slug string) (UrlR
 		}
 		redirectPaths.GeneralRedirectPath = urlRedirectPaths.GeneralRedirectPath
 		redirectPaths.IosRedirectPath = urlRedirectPaths.IosRedirectPath.String
-		err = s.setDirectUrlInRedis(ctx, slug, redirectPaths, urlRedirectPaths.ExpiresAt.Time)
+		redirectPaths.Expiry = urlRedirectPaths.ExpiresAt.Time
+
+		err = s.setDirectUrlInRedis(ctx, slug, redirectPaths)
 		if err != nil {
 			return redirectPaths, err
 		}
@@ -437,14 +448,14 @@ func (s *UrlService) getStaticUrlFromDB(ctx context.Context, slug, deviceType st
 	return content, nil
 }
 
-func (s *UrlService) setDirectUrlInRedis(ctx context.Context, slug string, redirectUrl UrlRedirectPathsData, exp time.Time) error {
+func (s *UrlService) setDirectUrlInRedis(ctx context.Context, slug string, redirectUrl UrlRedirectPathsData) error {
 	err := s.Redis.DirectUrlClient.HSet(ctx, slug, generalRedirectPathRedisKey, redirectUrl.GeneralRedirectPath, iosRedirectPathRedisKey, redirectUrl.IosRedirectPath).Err()
 	if err != nil {
 		return err
 	}
 
-	if !exp.IsZero() {
-		return s.Redis.DirectUrlClient.ExpireAt(ctx, slug, exp).Err()
+	if !redirectUrl.Expiry.IsZero() {
+		return s.Redis.DirectUrlClient.ExpireAt(ctx, slug, redirectUrl.Expiry).Err()
 	}
 	return nil
 }
@@ -489,7 +500,8 @@ func (s *UrlService) handleUrlPropsChange(ctx context.Context, row dbQueries.Get
 		return s.setDirectUrlInRedis(ctx, row.Slug, UrlRedirectPathsData{
 			IosRedirectPath:     row.IosRedirectPath.String,
 			GeneralRedirectPath: row.GeneralRedirectPath,
-		}, row.ExpiresAt.Time)
+			Expiry:              row.ExpiresAt.Time,
+		})
 	case "static":
 		staticUrl, err := s.DB.AppQueries.GetStaticUrlByUrlID(ctx, row.ID)
 		if err != nil {
