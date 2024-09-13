@@ -8,7 +8,6 @@ import (
 	sLog "github.com/create-go-app/fiber-go-template/platform/logger/serverLogger"
 	"github.com/gofiber/fiber/v2"
 	"strings"
-	"time"
 )
 
 const RedirectMatchRegex = "^(?i)[A-Za-z0-9_]+$"
@@ -29,7 +28,7 @@ func RedirectController(app *fiber.App, db *database.Params, redisClients cache.
 		if err != nil {
 			return err
 		}
-		c.Set("Cache-Control", fmt.Sprintf("public, max-age=%v", urlData.Expiry.Sub(time.Now()).Seconds()))
+		c.Set("Cache-Control", fmt.Sprintf("public, max-age=%v", urlData.Expiry.Seconds()))
 		if urlData.IosRedirectPath != "" {
 			UA := c.Get("User-Agent")
 			if strings.Contains(UA, "iPhone") || strings.Contains(UA, "iPad") {
