@@ -59,7 +59,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 
 	return (
 		<FormItemContext.Provider value={{ id }}>
-			<div ref={ref} className={cn("space-y-2", className)} {...props} />
+			<div ref={ref} className={cn("w-full space-y-2", className)} {...props} />
 		</FormItemContext.Provider>
 	);
 });
@@ -94,7 +94,7 @@ const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
 	({ className, ...props }, ref) => {
 		const { formDescriptionId } = useFormField();
 
-		return <p ref={ref} id={formDescriptionId} className={cn("text-muted-foreground text-sm", className)} {...props} />;
+		return <p ref={ref} id={formDescriptionId} className={cn("text-sm text-muted-foreground", className)} {...props} />;
 	}
 );
 FormDescription.displayName = "FormDescription";
@@ -111,7 +111,7 @@ const FormMessage = React.forwardRef<
 	if (!body && !shouldAnimate) return <></>;
 	if (!shouldAnimate)
 		return (
-			<p ref={ref} id={formMessageId} className={cn("text-destructive text-sm font-medium", className)}>
+			<p ref={ref} id={formMessageId} className={cn("text-sm font-medium text-destructive", className)}>
 				{body}
 			</p>
 		);
@@ -126,7 +126,7 @@ const FormMessage = React.forwardRef<
 					ref={ref}
 					id={formMessageId}
 					key={formMessageId}
-					className={cn("text-destructive text-sm font-medium", className)}
+					className={cn("text-sm font-medium text-destructive", className)}
 					// This is just to get around an error, TODO: -added proper type for props
 					{...(props as unknown as MotionProps)}
 				>

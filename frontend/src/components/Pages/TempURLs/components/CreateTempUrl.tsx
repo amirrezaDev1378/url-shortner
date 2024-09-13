@@ -100,8 +100,10 @@ const CreateTempUrl: FC<CreateTempUrlProps> = (props) => {
 	return (
 		<>
 			<AppFormProvider preventDefault className={"flex w-full flex-col items-center"} methods={methods}>
-				<div className={"flex w-[50%] flex-col flex-wrap gap-6 rounded-xl border-2 border-solid border-neutral-700 p-6"}>
-					<h4 className={"mb-2 text-center text-4xl"}>Standard URL</h4>
+				<div
+					className={"relative flex w-10/12 flex-col flex-wrap gap-6 rounded-xl border-2 border-solid border-neutral-700 p-6 md:w-1/2"}
+				>
+					<h4 className={"mb-2 w-full text-center text-4xl"}>Standard URL</h4>
 
 					<RHFTextInput animatedInput animateError name={"general_redirect_path"} label={"Destination URL"} />
 
@@ -143,10 +145,15 @@ const CreateTempUrl: FC<CreateTempUrlProps> = (props) => {
 					</AnimatePresence>
 					<div className={"flex flex-col gap-3"}>
 						<Label>Expiration</Label>
-						<AnimatedTabs activeTab={activeExpiration} setActiveTab={onExpirationChange} tabs={ExpirationOptionsTab} />
+						<AnimatedTabs
+							containerClassName={"w-full flex flex-row flex-wrap md:flex-nowrap items-start j"}
+							activeTab={activeExpiration}
+							setActiveTab={onExpirationChange}
+							tabs={ExpirationOptionsTab}
+						/>
 					</div>
 
-					<Button onClick={onFormSubmit} type={"submit"}>
+					<Button onClick={onFormSubmit} type={"submit"} className={"w-full"}>
 						create
 					</Button>
 				</div>

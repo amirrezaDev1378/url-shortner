@@ -56,13 +56,13 @@ const CreatedUrlInfoModal: FC<CreatedUrlInfoModalProps> = ({ slug, expiration, o
 		<Dialog open defaultOpen onOpenChange={onClose}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle className="text-3xl">Your URL has been created! 🎉</DialogTitle>
+					<DialogTitle className="text-2xl md:text-3xl">Your URL has been created! 🎉</DialogTitle>
 				</DialogHeader>
 				<DialogDescription className={"flex flex-col items-center justify-center"}>
 					<div className={"flex w-full flex-row items-center justify-between"}>
 						<div className={"flex w-9/12 flex-row items-center gap-2 rounded-md bg-gray-100 p-2"}>
-							<p className={"text-gray-700"}>Your URL is :</p>
-							<a href={createdUrl.toString()} className={"text-lg text-black hover:text-gray-500"} target={"_blank"}>
+							<p className={"md:text-md text-xs text-gray-700"}>Your URL is :</p>
+							<a href={createdUrl.toString()} className={"text-md text-black hover:text-gray-500 md:text-lg"} target={"_blank"}>
 								{createdUrl.toString()}
 							</a>
 						</div>
@@ -71,7 +71,7 @@ const CreatedUrlInfoModal: FC<CreatedUrlInfoModalProps> = ({ slug, expiration, o
 						</Button>
 					</div>
 					<hr className={"mb-2 mt-6 w-full"} />
-					<p className={"rounded-lg bg-gray-500 p-2 text-lg text-white"}>Your URL will expire in {expirationTime}</p>
+					<p className={"text-md rounded-lg bg-gray-500 p-2 text-white md:text-lg"}>Your URL will expire in {expirationTime}</p>
 				</DialogDescription>
 			</DialogContent>
 		</Dialog>
