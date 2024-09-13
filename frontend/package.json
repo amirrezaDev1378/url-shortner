@@ -32,6 +32,7 @@
 		"@types/react-dom": "^18.3.0",
 		"astro": "4.15.4",
 		"axios": "^1.7.7",
+		"canvas-confetti": "^1.9.3",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"express": "^4.21.0",
@@ -54,6 +55,7 @@
 	],
 	"devDependencies": {
 		"@types/bun": "^1.1.9",
+		"@types/canvas-confetti": "^1.6.4",
 		"@types/express": "^4.17.21",
 		"@vitejs/plugin-basic-ssl": "^1.1.0",
 		"husky": "^9.1.6",
