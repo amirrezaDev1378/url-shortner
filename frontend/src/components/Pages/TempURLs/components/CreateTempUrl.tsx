@@ -8,7 +8,7 @@ import { Button } from "@UI/button.tsx";
 import type { CreateUrlRequest, CreateUrlResponse } from "@/models/generated.ts";
 import { ZodUrl } from "@/lib/validation.ts";
 import { AnimatePresence, motion } from "framer-motion";
-import { XIcon } from "lucide-react";
+import { LuX as XIcon } from "react-icons/lu";
 import { CreateTempUrlService } from "@/services/tempUrls.ts";
 import { Label } from "@UI/label.tsx";
 import { AnimatedTabs, type Tab } from "@UI/AnimatedTabs.tsx";
