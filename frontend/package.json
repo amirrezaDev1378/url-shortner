@@ -3,10 +3,11 @@
 	"type": "commonjs",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "bun --bun astro dev",
+		"dev": "bun --bun astro dev --host 0.0.0.0",
 		"build-and-check": "bun --bun astro check && bun run build",
 		"build": " bun --bun astro build",
 		"preview": "bun  astro preview",
+		"run-server": "bun ./src/server.js",
 		"prepare": "cd .. && husky frontend/.husky",
 		"codegen": "cd ../backend && tygo generate",
 		"temp-run-be": "wsl -e bash -c \"cd ../backend && make watch\""
