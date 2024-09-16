@@ -1,7 +1,11 @@
 ---
-
 import OAuthHandlePage from "src/components/Pages/Auth/OAuthHandlePage";
+import GlobalLayout from "src/layouts/GlobalLayout.astro";
+import AuthLayout from "src/components/Pages/Auth/Layout";
 ---
 
-
-<OAuthHandlePage client:load />
+<GlobalLayout title="Authenticating">
+	<AuthLayout client:idle>
+		<OAuthHandlePage client:load />
+	</AuthLayout>
+</GlobalLayout>

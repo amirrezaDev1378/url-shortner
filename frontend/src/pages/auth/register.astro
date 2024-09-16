@@ -1,9 +1,13 @@
 ---
 import GlobalLayout from "../../layouts/GlobalLayout.astro";
 import RegisterPage from "../../components/Pages/Auth/RegisterPage";
+import AuthLayout from "src/components/Pages/Auth/Layout";
 
-export const prerender = true
+export const prerender = true;
 ---
+
 <GlobalLayout title="login">
-    <RegisterPage client:idle />
+	<AuthLayout client:idle>
+		<RegisterPage client:idle />
+	</AuthLayout>
 </GlobalLayout>
