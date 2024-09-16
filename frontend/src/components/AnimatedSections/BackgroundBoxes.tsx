@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, type MotionStyle } from "framer-motion";
 import { cn } from "@/lib/shadcn-utils.ts";
 
 export const BoxesCore = ({ className, boxBorderColors = "--slate-700", ...rest }: { className?: string; boxBorderColors?: string }) => {
@@ -36,16 +36,22 @@ export const BoxesCore = ({ className, boxBorderColors = "--slate-700", ...rest 
 				<motion.div key={`row` + i} className="relative h-8 w-16 border-l" style={{ borderColor }}>
 					{cols.map((_, j) => (
 						<motion.div
+							suppressHydrationWarning
 							whileHover={{
-								backgroundColor: `var(${getRandomColor()})`,
+								backgroundColor: `var(--random-color)`,
+								transition: { duration: 0 },
+							}}
+							whileTap={{
+								backgroundColor: `var(--random-color)`,
 								transition: { duration: 0 },
 							}}
 							animate={{
-								transition: { duration: 2 },
+								backgroundColor: "#000",
+								transition: { duration: 0.4 },
 							}}
 							key={`col` + j}
 							className="relative h-8 w-16 border-r border-t"
-							style={{ borderColor }}
+							style={{ borderColor, "--random-color": `var(${getRandomColor()})` } as MotionStyle}
 						>
 							{j % 2 === 0 && i % 2 === 0 ? (
 								<svg
