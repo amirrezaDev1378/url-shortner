@@ -2,7 +2,7 @@ import React, { type FC, useState } from "react";
 import { CardHoverEffect, type HoverCardItemType } from "@UI/HoverCard.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { CreateStandardUrl, CreateUrlWithPage, CreateUrlWithProxy } from "./components/CreateUrlComponents";
-import { Undo2 } from "lucide-react";
+import { LuUndo2 as Undo2 } from "react-icons/lu";
 import { Button } from "@UI/button.tsx";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/UI/dialog";
 

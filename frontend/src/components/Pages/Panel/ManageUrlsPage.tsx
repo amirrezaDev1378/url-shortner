@@ -3,7 +3,7 @@ import { type FC } from "react";
 import { Button } from "@UI/button.tsx";
 import { type ColumnDef } from "@tanstack/react-table";
 import SimpleTable from "@UI/SimpleTable.tsx";
-import { ArrowUpDown } from "lucide-react";
+import { LuArrowUpDown as ArrowUpDown } from "react-icons/lu";
 
 interface ShortLink {
 	name: string;
@@ -45,10 +45,10 @@ const data = [
 
 const ManageUrlsPage: FC = () => {
 	return (
-		<div className={"flex flex-col w-full p-6"}>
-			<h3 className={"text-left text-3xl mt-5 w-full"}>Manage Your Shorted Links.</h3>
+		<div className={"flex w-full flex-col p-6"}>
+			<h3 className={"mt-5 w-full text-left text-3xl"}>Manage Your Shorted Links.</h3>
 			<hr className={"my-4 w-full"} />
-			<div className="flex flex-row items-center justify-between w-full mb-4 mt-4">
+			<div className="mb-4 mt-4 flex w-full flex-row items-center justify-between">
 				<p>All Links</p>
 				<Button type={"button"} variant={"default"}>
 					<a href="/panel/create">Create New Link</a>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { type FC, type ReactNode, useState } from "react";
-import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { RxHamburgerMenu as HamburgerMenuIcon } from "react-icons/rx";
 import { cn } from "@/lib/shadcn-utils.ts";
 
 interface Props {

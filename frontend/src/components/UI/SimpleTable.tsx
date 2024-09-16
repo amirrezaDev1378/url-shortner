@@ -17,7 +17,7 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "@UI/button.tsx";
-import { ArrowUpDown } from "lucide-react";
+import { LuArrowUpDown as ArrowUpDown } from "react-icons/lu";
 import * as React from "react";
 
 interface Props<T = any> {

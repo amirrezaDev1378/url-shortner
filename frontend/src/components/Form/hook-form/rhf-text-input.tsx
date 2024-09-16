@@ -4,7 +4,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { AnimatedInput } from "@UI/AnimatedInput.tsx";
 import * as React from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@UI/tooltip.tsx";
-import { CircleHelp } from "lucide-react";
+import { LuHelpCircle as CircleHelp } from "react-icons/lu";
 import { cn } from "@/lib/shadcn-utils.ts";
 
 type Props = InputProps & {

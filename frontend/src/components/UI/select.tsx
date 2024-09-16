@@ -1,5 +1,10 @@
 import * as React from "react";
-import { CaretSortIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import {
+	RxCaretSort as CaretSortIcon,
+	RxCheck as CheckIcon,
+	RxChevronDown as ChevronDownIcon,
+	RxChevronUp as ChevronUpIcon,
+} from "react-icons/rx";
 import * as SelectPrimitive from "@radix-ui/react-select";
 
 import { cn } from "@/lib/shadcn-utils";

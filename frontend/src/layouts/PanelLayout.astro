@@ -1,11 +1,10 @@
 ---
 import GlobalLayout from "./GlobalLayout.astro";
-import {HamburgerMenuIcon} from "@radix-ui/react-icons";
 import PanelLayout from "./components/PanelLayout";
 ---
 
 <GlobalLayout>
-    <PanelLayout currentRoute={Astro.url.pathname} client:idle>
-        <slot />
-    </PanelLayout>
+	<PanelLayout currentRoute={Astro.url.pathname} client:idle>
+		<slot />
+	</PanelLayout>
 </GlobalLayout>
