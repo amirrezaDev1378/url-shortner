@@ -13,7 +13,10 @@ const registerFormSchema = z
 		password: z.string().trim().min(1, { message: "invalid" }),
 		passwordRepeat: z.string().trim().min(1, { message: "invalid" }),
 	})
-	.refine(({ passwordRepeat, password }) => passwordRepeat === password, { message: "passwords do not match", path: ["passwordRepeat"] });
+	.refine(({ passwordRepeat, password }) => passwordRepeat === password, {
+		message: "passwords do not match",
+		path: ["passwordRepeat"],
+	});
 const RegisterPage: FC = () => {
 	const form = useForm<z.infer<typeof registerFormSchema>>({
 		resolver: zodResolver(registerFormSchema),
@@ -37,9 +40,9 @@ const RegisterPage: FC = () => {
 			.catch(() => alert("I Told you long ago.."));
 	});
 	return (
-		<div className="items-center justify-center flex w-full h-[100vh]">
-			<div className="rounded-2xl w-[300px] min-h-80 bg-background border-solid border-2 border-neutral-800">
-				<AppFormProvider className={"p-4 gap-4 flex-col flex"} methods={form} onSubmit={onSubmit}>
+		<div className="flex w-full items-center justify-center">
+			<div className="w-[300px] rounded-2xl border-2 border-solid border-neutral-800 bg-background md:min-h-80">
+				<AppFormProvider className={"flex flex-col gap-4 p-4"} methods={form} onSubmit={onSubmit}>
 					<RHFTextInput animatedInput animateError placeholder={"Username"} label={"Username"} name={"username"} />
 					<RHFTextInput animatedInput animateError placeholder={"Password"} label={"Password"} name={"password"} type={"password"} />
 					<RHFTextInput
