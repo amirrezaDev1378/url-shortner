@@ -6,44 +6,82 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@UI/button.tsx";
 import RHFTextInput from "@/components/Form/hook-form/rhf-text-input.tsx";
 import { initIdsRequest } from "@/lib/request.ts";
+import OAuthProviders from "@/components/Pages/Auth/OAuth";
+import { LuMail } from "react-icons/lu";
+import { toast } from "@/hooks/useToast.ts";
+import { handleServiceError } from "@/lib/services.ts";
+import { AuthErrorMessages, type AuthErrorMessagesType } from "@/services/error/descriptions/auth.ts";
 
 const registerFormSchema = z
 	.strictObject({
-		username: z.string().trim().min(1, { message: "invalid" }),
-		password: z.string().trim().min(1, { message: "invalid" }),
-		passwordRepeat: z.string().trim().min(1, { message: "invalid" }),
+		email: z
+			.string({ errorMap: () => ({ message: "Please enter a valid email address." }) })
+			.trim()
+			.min(1)
+			.email(),
+		password: z.string({ message: "Invalid password." }).trim().min(6, { message: "Your password must be at least 6 characters long." }),
+		passwordRepeat: z.string({ message: "Invalid password." }).trim().min(1, { message: "Invalid password." }),
 	})
 	.refine(({ passwordRepeat, password }) => passwordRepeat === password, {
-		message: "passwords do not match",
+		message: "Password repeat does not match",
 		path: ["passwordRepeat"],
 	});
 const RegisterPage: FC = () => {
 	const form = useForm<z.infer<typeof registerFormSchema>>({
 		resolver: zodResolver(registerFormSchema),
 		defaultValues: {
-			username: "",
+			email: "",
 			password: "",
 			passwordRepeat: "",
 		},
 		mode: "all",
 	});
-	const { handleSubmit } = form;
+	const {
+		handleSubmit,
+		formState: { isSubmitting },
+	} = form;
+
 	const onSubmit = handleSubmit((data) => {
 		initIdsRequest()
 			.post("/email/register", {
-				email: data.username,
+				email: data.email,
 				password: data.password,
 			})
 			.then((r) => {
-				alert("Done!");
+				if (!r.data.success) throw new Error("Something went wrong");
+				toast({
+					type: "foreground",
+					variant: "default",
+					title: "Account created.",
+					description: "Your account has been created. You will be redirected to the panel.",
+				});
+				setTimeout(() => {
+					window.history.pushState({}, "", "/panel");
+				});
 			})
-			.catch(() => alert("I Told you long ago.."));
+			.catch((err) => {
+				const serviceError = handleServiceError(err);
+
+				toast({
+					type: "foreground",
+					variant: "destructive",
+					title: "Something went wrong.",
+					description: AuthErrorMessages[serviceError.message as string] || AuthErrorMessages.Unknown,
+				});
+			});
 	});
 	return (
-		<div className="flex w-full items-center justify-center">
-			<div className="w-[300px] rounded-2xl border-2 border-solid border-neutral-800 bg-background md:min-h-80">
-				<AppFormProvider className={"flex flex-col gap-4 p-4"} methods={form} onSubmit={onSubmit}>
-					<RHFTextInput animatedInput animateError placeholder={"Username"} label={"Username"} name={"username"} />
+		<div className="flex h-fit w-full items-center justify-center">
+			<div className="flex h-fit w-[300px] flex-col items-center rounded-2xl border-2 border-solid border-neutral-800 bg-background p-4">
+				<div className={"mb-5 w-full"}>
+					<p className={"text-center text-[1.7rem] text-white"}>Creating an account.</p>
+					<a href="/auth/login" className={"block w-full text-center text-sm text-neutral-400 hover:text-neutral-300 hover:underline"}>
+						Already have an account? Login.
+					</a>
+				</div>
+
+				<AppFormProvider className={"flex w-full flex-col gap-4"} methods={form} preventDefault>
+					<RHFTextInput animatedInput animateError placeholder={"Your email address."} label={"Email"} name={"email"} />
 					<RHFTextInput animatedInput animateError placeholder={"Password"} label={"Password"} name={"password"} type={"password"} />
 					<RHFTextInput
 						animatedInput
@@ -54,8 +92,12 @@ const RegisterPage: FC = () => {
 						type={"password"}
 					/>
 
-					<Button type={"submit"}>submit</Button>
+					<Button onClick={onSubmit} type={"submit"} className={"flex flex-row items-center gap-2"}>
+						<LuMail />
+						Continue With Email
+					</Button>
 				</AppFormProvider>
+				<OAuthProviders />
 			</div>
 		</div>
 	);

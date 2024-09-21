@@ -10,26 +10,30 @@ import OAuthProviders from "@/components/Pages/Auth/OAuth";
 import { LuMail } from "react-icons/lu";
 
 const loginFormSchema = z.strictObject({
-	username: z.string().trim().min(1, { message: "invalid" }),
-	password: z.string().trim().min(1, { message: "invalid" }),
+	email: z
+		.string({ errorMap: () => ({ message: "Please enter a valid email address." }) })
+		.trim()
+		.min(1)
+		.email(),
+	password: z.string({ message: "Invalid password." }).trim().min(6, { message: "Your password must be at least 6 characters long." }),
 });
 
 const LoginPage: FC = () => {
 	const form = useForm<z.infer<typeof loginFormSchema>>({
 		resolver: zodResolver(loginFormSchema),
 		defaultValues: {
-			username: "",
+			email: "",
 			password: "",
 		},
 		mode: "all",
 	});
 	const { handleSubmit } = form;
-	const onSubmit = handleSubmit((data) => {
+	const handleEmailLogin = handleSubmit((data) => {
 		initIdsRequest()
 			.post(
 				"/email/login",
 				{
-					email: data.username,
+					email: data.email,
 					password: data.password,
 				},
 				{
@@ -51,11 +55,17 @@ const LoginPage: FC = () => {
 	return (
 		<div className="flex h-fit w-full items-center justify-center">
 			<div className="flex h-fit w-[300px] flex-col items-center rounded-2xl border-2 border-solid border-neutral-800 bg-background p-4">
-				<AppFormProvider className={"flex w-full flex-col gap-4"} methods={form} onSubmit={onSubmit}>
-					<RHFTextInput animatedInput animateError placeholder={"Username"} label={"Username"} name={"username"} />
+				<div className={"mb-5 w-full"}>
+					<p className={"text-center text-[1.7rem] text-white"}>Login to account.</p>
+					<a href="/auth/login" className={"block w-full text-center text-sm text-neutral-400 hover:text-neutral-300 hover:underline"}>
+						Don't have an account? Create one.
+					</a>
+				</div>
+				<AppFormProvider className={"flex w-full flex-col gap-4"} methods={form} preventDefault>
+					<RHFTextInput animatedInput animateError placeholder={"Your email address."} label={"Email"} name={"email"} />
 					<RHFTextInput animatedInput animateError placeholder={"Password"} label={"Password"} name={"password"} type={"password"} />
 
-					<Button type={"submit"} className={"flex flex-row items-center gap-2"}>
+					<Button onClick={handleEmailLogin} type={"submit"} className={"flex flex-row items-center gap-2"}>
 						<LuMail />
 						Continue With Email
 					</Button>
