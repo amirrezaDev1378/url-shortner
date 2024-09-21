@@ -2,7 +2,7 @@ import { initIdsRequest } from "@/lib/request.ts";
 
 const idsRequest = initIdsRequest();
 
-export const requestOauthLink = async (provider: string) => {
+const requestOauthLink = async (provider: string) => {
 	if (!provider) throw new Error("No Provider Provided.");
 	return await idsRequest
 		.post(`/oauth/${provider}/login`)
@@ -19,21 +19,38 @@ export const requestOauthLink = async (provider: string) => {
 		}));
 };
 
-export const handleOAuthLogin = async (params: { provider: string; code: string; state: string }) => {
+const handleOAuthLogin = async (params: { provider: string; code: string; state: string }) => {
 	const { code, state, provider } = params;
 	if (!provider) throw new Error("No Provider Provided.");
 	await idsRequest
-		.post(
-			`/oauth/${provider}/callback`,
-			{
-				code,
-				state,
-			},
-			{
-				withCredentials: true,
-			}
-		)
+		.post(`/oauth/${provider}/callback`, {
+			code,
+			state,
+		})
 		.then(({ data }) => {
 			if (data.token) localStorage.setItem("token", data.token);
 		});
 };
+
+const createAccountWithEmail = ({ email, password }: { email: string; password: string }) => {
+	return idsRequest.post("/email/register", {
+		email,
+		password,
+	});
+};
+
+const loginWithEmail = ({ email, password }: { email: string; password: string }) => {
+	return idsRequest.post("/email/login", {
+		email,
+		password,
+	});
+};
+
+const authServices = {
+	requestOauthLink,
+	handleOAuthLogin,
+	createAccountWithEmail,
+	loginWithEmail,
+};
+
+export default authServices;

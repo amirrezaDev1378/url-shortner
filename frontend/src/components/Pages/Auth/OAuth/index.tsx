@@ -1,6 +1,6 @@
 import React, { type FC } from "react";
 import { Button } from "@UI/button.tsx";
-import { requestOauthLink } from "@/services/auth.ts";
+import authServices, { requestOauthLink } from "@/services/auth.ts";
 import { FcGoogle } from "react-icons/fc";
 
 const AvailableProviders = [
@@ -19,7 +19,7 @@ const OAuthProviders: FC = () => {
 	if (!providers || providers?.length === 0) throw new Error("OAuth is enabled but no OAuth providers found");
 
 	const handleProviderLogin = (provider: (typeof AvailableProviders)[number]["name"]) => () => {
-		requestOauthLink(provider).then(({ redirectUrl, error }) => {
+		authServices.requestOauthLink(provider).then(({ redirectUrl, error }) => {
 			if (error || !redirectUrl) return alert("Errr");
 			window.open(redirectUrl, "_blank");
 		});
