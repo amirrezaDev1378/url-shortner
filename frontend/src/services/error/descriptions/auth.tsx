@@ -1,14 +1,29 @@
 import AuthErrorsList from "@/services/error/messages/auth.ts";
+import type { ReactNode } from "react";
 
 export type AuthErrorMessagesType = {
-	[key in AuthErrorsList | "Unknown" | string]?: string;
+	[key in AuthErrorsList | "Unknown" | string]?: string | ReactNode;
 };
 
 /**
  * This is a list of human friendly error descriptions.
  */
-export const AuthErrorMessages: AuthErrorMessagesType = {
-	[AuthErrorsList.ErrUserAlreadyExists]: "User with the provided email already exists.",
+export const AuthErrorDescriptions: AuthErrorMessagesType = {
+	[AuthErrorsList.ErrUserAlreadyExists]: (
+		<div className={"text-white"}>
+			User with the provided email already exists.
+			<br />
+			If you have already registered,{" "}
+			<a className={"underline hover:text-neutral-300"} href="/login">
+				login here.
+			</a>
+			<br />
+			If you have forgotten your password,{" "}
+			<a className={"underline hover:text-neutral-300"} href="/reset-password">
+				reset it here.
+			</a>
+		</div>
+	),
 	[AuthErrorsList.ErrInvalidCredentials]: "The provided email or password is incorrect.",
 	[AuthErrorsList.ErrTooMuchRequests]: "You have tried to login too many times. Please try again later.",
 	[AuthErrorsList.ErrUserNotFound]: "We could not find a user with the provided credentials.",

@@ -10,7 +10,7 @@ import OAuthProviders from "@/components/Pages/Auth/OAuth";
 import { LuMail } from "react-icons/lu";
 import { toast } from "@/hooks/useToast.ts";
 import { handleServiceError } from "@/lib/services.ts";
-import { AuthErrorMessages, type AuthErrorMessagesType } from "@/services/error/descriptions/auth.ts";
+import { AuthErrorDescriptions } from "@/services/error/descriptions/auth.tsx";
 
 const registerFormSchema = z
 	.strictObject({
@@ -66,7 +66,7 @@ const RegisterPage: FC = () => {
 					type: "foreground",
 					variant: "destructive",
 					title: "Something went wrong.",
-					description: AuthErrorMessages[serviceError.message as string] || AuthErrorMessages.Unknown,
+					description: AuthErrorDescriptions[serviceError.message as string] || AuthErrorDescriptions.Unknown,
 				});
 			});
 	});
