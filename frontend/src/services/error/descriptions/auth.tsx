@@ -28,5 +28,5 @@ export const AuthErrorDescriptions: AuthErrorMessagesType = {
 	[AuthErrorsList.ErrTooMuchRequests]: "You have tried to login too many times. Please try again later.",
 	[AuthErrorsList.ErrUserNotFound]: "We could not find a user with the provided credentials.",
 	[AuthErrorsList.ErrUserLocked]: "You have tried to login too many times. Please try again later.",
-	Unknown: "Something went wrong while creating your account. Please try again later and if the problem persists, contact the support.",
+	Unknown: "Something went wrong. Please try again later and if the problem persists, contact the support.",
 };
