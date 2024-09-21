@@ -35,8 +35,7 @@ const LoginPage: FC = () => {
 	const handleEmailLogin = handleSubmit(({ email, password }) => {
 		authServices
 			.loginWithEmail({ email, password })
-			.then((r) => {
-				if (!r.data.success) throw new Error("Something went wrong");
+			.then(() => {
 				toast({
 					type: "foreground",
 					variant: "default",
@@ -44,8 +43,8 @@ const LoginPage: FC = () => {
 					description: "Your are now logged in. You will be redirected to the panel.",
 				});
 				setTimeout(() => {
-					window.history.pushState({}, "", "/panel");
-				});
+					window.location.replace("/panel");
+				}, 500);
 			})
 			.catch((err) => {
 				const serviceError = handleServiceError(err);

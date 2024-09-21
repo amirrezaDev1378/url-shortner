@@ -33,17 +33,27 @@ const handleOAuthLogin = async (params: { provider: string; code: string; state:
 };
 
 const createAccountWithEmail = ({ email, password }: { email: string; password: string }) => {
-	return idsRequest.post("/email/register", {
-		email,
-		password,
-	});
+	return idsRequest
+		.post("/email/register", {
+			email,
+			password,
+		})
+		.then((r) => {
+			if (!r.data.success) throw new Error("Something went wrong");
+			return r;
+		});
 };
 
 const loginWithEmail = ({ email, password }: { email: string; password: string }) => {
-	return idsRequest.post("/email/login", {
-		email,
-		password,
-	});
+	return idsRequest
+		.post("/email/login", {
+			email,
+			password,
+		})
+		.then((r) => {
+			if (!r.data.success) throw new Error("Something went wrong");
+			return r;
+		});
 };
 
 const authServices = {

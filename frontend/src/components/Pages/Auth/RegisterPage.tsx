@@ -48,7 +48,6 @@ const RegisterPage: FC = () => {
 		authServices
 			.createAccountWithEmail({ email, password })
 			.then((r) => {
-				if (!r.data.success) throw new Error("Something went wrong");
 				toast({
 					type: "foreground",
 					variant: "default",
