@@ -51,7 +51,7 @@ func EmailAuthController(router fiber.Router, authParams *authConfig.Params) {
 			return serverErr.SetMessage(appErrors.ErrSessionCreationFailed).GetError()
 		}
 
-		return nil
+		return ctx.Status(200).JSON(&EmailAuthResponse{Success: true})
 	})
 	router.Post("/email/register", func(ctx *fiber.Ctx) error {
 		serverErr := appErrors.ServerError{}
