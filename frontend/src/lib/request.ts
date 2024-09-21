@@ -12,7 +12,6 @@ export const initIdsRequest = () => {
 	return _idsRequest;
 };
 
-export const authRequest = axios.create({});
 export const generalRequest = axios.create({
 	baseURL: import.meta.env.PUBLIC_BACKEND_URL,
 });
