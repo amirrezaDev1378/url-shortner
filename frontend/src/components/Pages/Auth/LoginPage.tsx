@@ -1,13 +1,16 @@
-import React, { type FC, useEffect } from "react";
+import React, { type FC } from "react";
 import { useForm } from "react-hook-form";
 import AppFormProvider from "@/components/Form/hook-form/app-form-provider.tsx";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@UI/button.tsx";
 import RHFTextInput from "@/components/Form/hook-form/rhf-text-input.tsx";
-import { initIdsRequest } from "@/lib/request.ts";
 import OAuthProviders from "@/components/Pages/Auth/OAuth";
 import { LuMail } from "react-icons/lu";
+import authServices from "@/services/auth.ts";
+import { toast } from "@/hooks/useToast.ts";
+import { handleServiceError } from "@/lib/services.ts";
+import { AuthErrorDescriptions } from "@/services/error/descriptions/auth.tsx";
 
 const loginFormSchema = z.strictObject({
 	email: z
@@ -28,29 +31,33 @@ const LoginPage: FC = () => {
 		mode: "all",
 	});
 	const { handleSubmit } = form;
-	const handleEmailLogin = handleSubmit((data) => {
-		initIdsRequest()
-			.post(
-				"/email/login",
-				{
-					email: data.email,
-					password: data.password,
-				},
-				{
-					withCredentials: true,
-				}
-			)
-			.then((r) => {
-				alert("Done!");
-			})
-			.catch(() => alert("I Told you long ago.."));
-	});
 
-	useEffect(() => {
-		initIdsRequest().get("/user/user-info", {
-			withCredentials: true,
-		});
-	}, []);
+	const handleEmailLogin = handleSubmit(({ email, password }) => {
+		authServices
+			.loginWithEmail({ email, password })
+			.then((r) => {
+				if (!r.data.success) throw new Error("Something went wrong");
+				toast({
+					type: "foreground",
+					variant: "default",
+					title: "Logged in successfully.",
+					description: "Your are now logged in. You will be redirected to the panel.",
+				});
+				setTimeout(() => {
+					window.history.pushState({}, "", "/panel");
+				});
+			})
+			.catch((err) => {
+				const serviceError = handleServiceError(err);
+
+				toast({
+					type: "foreground",
+					variant: "destructive",
+					title: "Something went wrong.",
+					description: AuthErrorDescriptions[serviceError.message as string] || AuthErrorDescriptions.Unknown,
+				});
+			});
+	});
 
 	return (
 		<div className="flex h-fit w-full items-center justify-center">

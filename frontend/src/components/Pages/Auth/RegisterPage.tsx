@@ -5,12 +5,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@UI/button.tsx";
 import RHFTextInput from "@/components/Form/hook-form/rhf-text-input.tsx";
-import { initIdsRequest } from "@/lib/request.ts";
 import OAuthProviders from "@/components/Pages/Auth/OAuth";
 import { LuMail } from "react-icons/lu";
 import { toast } from "@/hooks/useToast.ts";
 import { handleServiceError } from "@/lib/services.ts";
 import { AuthErrorDescriptions } from "@/services/error/descriptions/auth.tsx";
+import authServices from "@/services/auth.ts";
 
 const registerFormSchema = z
 	.strictObject({
@@ -38,15 +38,15 @@ const RegisterPage: FC = () => {
 	});
 	const {
 		handleSubmit,
-		formState: { isSubmitting },
+		formState: {
+			// TODO: add loading with this field.
+			isSubmitting,
+		},
 	} = form;
 
-	const onSubmit = handleSubmit((data) => {
-		initIdsRequest()
-			.post("/email/register", {
-				email: data.email,
-				password: data.password,
-			})
+	const onSubmit = handleSubmit(({ password, email }) => {
+		authServices
+			.createAccountWithEmail({ email, password })
 			.then((r) => {
 				if (!r.data.success) throw new Error("Something went wrong");
 				toast({
