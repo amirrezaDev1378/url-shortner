@@ -23,12 +23,12 @@ func EmailAuthController(router fiber.Router, authParams *authConfig.Params) {
 		payload := RegisterWithCredentialPayload{}
 
 		if err := ctx.BodyParser(&payload); err != nil {
-			return serverErr.SetStatus(400).Send(ctx)
+			return appErrors.ErrInvalidPayload.SendCtx(ctx)
 		}
 		v := validator.New()
 
 		if err := v.Struct(payload); err != nil {
-			return serverErr.SetStatus(400).Send(ctx)
+			return appErrors.ErrInvalidPayload.SendCtx(ctx)
 		}
 		user := authStore.StorableUser{
 			Email:     payload.Email,
@@ -38,7 +38,7 @@ func EmailAuthController(router fiber.Router, authParams *authConfig.Params) {
 
 		err := user.Validate()
 		if err != nil {
-			return serverErr.SetMessage(appErrors.ErrInvalidPayload).GetError()
+			return appErrors.ErrInvalidPayload.SendCtx(ctx)
 		}
 
 		userID, loginErr := authParams.Store.LoginWithCredentials(ctx.UserContext(), user)
@@ -58,19 +58,19 @@ func EmailAuthController(router fiber.Router, authParams *authConfig.Params) {
 		payload := RegisterWithCredentialPayload{}
 
 		if err := ctx.BodyParser(&payload); err != nil {
-			return serverErr.SetStatus(400).SetMessage(appErrors.ErrInvalidPayload).Send(ctx)
+			return appErrors.ErrInvalidPayload.SendCtx(ctx)
 		}
 		v := validator.New()
 
 		if err := v.Struct(payload); err != nil {
-			return serverErr.SetStatus(400).SetMessage(appErrors.ErrInvalidPayload).Send(ctx)
+			return appErrors.ErrInvalidPayload.SendCtx(ctx)
 		}
 		exists, err := authParams.DB.AppQueries.CheckUserExists(ctx.UserContext(), payload.Email)
 		if err != nil {
 			return serverErr.SetStatus(500).SetMessage(appErrors.ErrServerErr).Send(ctx)
 		}
 		if exists {
-			return serverErr.SetStatus(400).Send(ctx)
+			return appErrors.ErrUserAlreadyExists.SendCtx(ctx)
 		}
 
 		user := authStore.StorableUser{
