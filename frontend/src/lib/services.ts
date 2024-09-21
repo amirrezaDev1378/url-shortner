@@ -1,4 +1,4 @@
-import type { AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 
 export interface ServiceError {
 	code: number;
@@ -10,11 +10,15 @@ export interface ServiceResponse<T extends any> {
 	error?: ServiceError;
 }
 
-export const handleServiceError = (result: AxiosResponse): ServiceError | null => {
+export interface ServerErrorResponse {
+	error_message: string;
+}
+
+export const handleServiceError = (result: AxiosError<ServerErrorResponse>): Partial<ServiceError> => {
 	const hasError = result instanceof Error;
-	if (!hasError) return null;
+	if (!hasError || !result) return {};
 	return {
-		code: result.status,
-		message: result.data?.message || "ERR_UNKNOWN_ERR",
+		code: result?.status || -1,
+		message: result?.response?.data?.error_message || result?.message || "ERR_UNKNOWN_ERR",
 	};
 };
