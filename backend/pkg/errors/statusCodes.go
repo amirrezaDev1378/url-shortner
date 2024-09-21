@@ -20,4 +20,7 @@ var statusCodes = map[AppError]int{
 	"ERR_INVALID_HTML_CONTENT":     400,
 	"ERR_NOT_FOUND":                404,
 	"ERR_SLUG_ALREADY_EXISTS":      400,
+	"ERR_USER_ALREADY_EXISTS":      400,
+	"ERR_INVALID_CREDENTIALS":      400,
+	"ERR_INVALID_SESSION":          403,
 }

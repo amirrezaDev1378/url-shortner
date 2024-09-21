@@ -51,7 +51,7 @@ func (e *ServerError) Send(c *fiber.Ctx) error {
 
 	if msg == "" {
 		msg = "InternalServerErrorCode2"
-		sLog.Error().Msgf("Error message can not be represented as string: %v", e.Message)
+		sLog.Error().Msgf("Error message can not be represented as string: %v", e)
 	}
 
 	var response = errorResponse{
