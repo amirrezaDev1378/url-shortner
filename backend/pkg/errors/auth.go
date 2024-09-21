@@ -2,6 +2,9 @@ package appErrors
 
 const (
 	ErrBadRequest            AppError = "ERR_BAD_REQUEST"
+	ErrUserAlreadyExists     AppError = "ERR_USER_ALREADY_EXISTS"
+	ErrInvalidCredentials    AppError = "ERR_INVALID_CREDENTIALS"
+	ErrInvalidSession        AppError = "ERR_INVALID_SESSION"
 	ErrInvalidCSRF           AppError = "ERR_INVALID_CSRF"
 	ErrInvalidProvider       AppError = " ERR_INVALID_PROVIDER"
 	ErrInvalidPayload        AppError = "ERR_INVALID_PAYLOAD"
