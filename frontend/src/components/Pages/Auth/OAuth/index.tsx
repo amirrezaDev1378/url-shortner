@@ -1,6 +1,6 @@
 import React, { type FC } from "react";
 import { Button } from "@UI/button.tsx";
-import authServices, { requestOauthLink } from "@/services/auth.ts";
+import authServices from "@/services/auth.ts";
 import { FcGoogle } from "react-icons/fc";
 
 const AvailableProviders = [
