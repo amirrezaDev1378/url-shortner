@@ -9,3 +9,7 @@ export const setUserHasCreatedURlBefore = (): void => {
 	if (typeof window === "undefined") return;
 	localStorage.setItem(createdFirstUrlKey, "true");
 };
+
+export const redirect = (url: string) => {
+	window.location.assign(url);
+};
