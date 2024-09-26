@@ -3,8 +3,8 @@ import GlobalLayout from "./GlobalLayout.astro";
 import PanelLayout from "./components/PanelLayout";
 ---
 
-<GlobalLayout>
-	<PanelLayout currentRoute={Astro.url.pathname} client:idle>
+<GlobalLayout title="panel">
+	<PanelLayout currentRoute={Astro.url.pathname} client:load>
 		<slot />
 	</PanelLayout>
 </GlobalLayout>
