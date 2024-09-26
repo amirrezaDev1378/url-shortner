@@ -8,6 +8,9 @@ export const initIdsRequest = () => {
 	_idsRequest = axios.create({
 		baseURL: import.meta.env.PUBLIC_IDS_URL,
 		withCredentials: true,
+		headers: {
+			"Content-Type": "application/json",
+		},
 	});
 	return _idsRequest;
 };
