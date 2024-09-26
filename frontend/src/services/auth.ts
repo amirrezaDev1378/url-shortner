@@ -1,4 +1,5 @@
 import { initIdsRequest } from "@/lib/request.ts";
+import type { UserInfoResponse } from "@/models/generated.ts";
 
 const idsRequest = initIdsRequest();
 
@@ -56,11 +57,19 @@ const loginWithEmail = ({ email, password }: { email: string; password: string }
 		});
 };
 
+const getUserInfo = () => {
+	return idsRequest.get<UserInfoResponse>("/user/user-info").then((r) => {
+		if (!r.data.id) throw new Error("Something went wrong");
+		return r;
+	});
+};
+
 const authServices = {
 	requestOauthLink,
 	handleOAuthLogin,
 	createAccountWithEmail,
 	loginWithEmail,
+	getUserInfo,
 };
 
 export default authServices;
