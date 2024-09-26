@@ -2,6 +2,7 @@ package authHandlers
 
 import (
 	"errors"
+	"github.com/create-go-app/fiber-go-template/app/models"
 	appErrors "github.com/create-go-app/fiber-go-template/pkg/errors"
 	"github.com/create-go-app/fiber-go-template/pkg/utils"
 	authConfig "github.com/create-go-app/fiber-go-template/platform/auth/config"
@@ -20,10 +21,6 @@ type UpdateUserParams struct {
 
 type AuthStatusResponse struct {
 	SessionExpiry string `json:"sessionExpiry"`
-}
-type UserInfoResponse struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
 }
 
 func (u UpdateUserParams) isZero() bool {
@@ -70,7 +67,7 @@ func UsersController(router fiber.Router, p *authConfig.Params) {
 			return generalServerErr.Send(ctx)
 		}
 
-		if err := ctx.JSON(UserInfoResponse{ID: sessionData.UserId, Email: user.Email}); err != nil {
+		if err := ctx.JSON(models.UserInfoResponse{ID: sessionData.UserId, Email: user.Email}); err != nil {
 			sLog.WithStackTrace(err).Send()
 			return generalServerErr.Send(ctx)
 		}
