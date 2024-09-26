@@ -78,32 +78,6 @@ const LoginPage: FC = () => {
 				</AppFormProvider>
 				<OAuthProviders />
 			</div>
-			{/*<hr />*/}
-			{/*<p>Fix these styles</p>*/}
-			{/*<button*/}
-			{/*	onClick={() => {*/}
-			{/*		const cacelToken = new AbortController();*/}
-
-			{/*		initIdsRequest().post(*/}
-			{/*			"https://127.0.0.1:3033/api/v1/urls/create",*/}
-			{/*			{*/}
-			{/*				slug: "s" + Math.round(Math.random() * 1000),*/}
-			{/*				general_redirect_path: "https://deadsimplechat.com/blog/how-to-use-go-channels/",*/}
-			{/*				ios_redirect_path: "https://time.ir",*/}
-			{/*				type: "static",*/}
-			{/*			},*/}
-			{/*			{*/}
-			{/*				signal: cacelToken.signal,*/}
-			{/*			}*/}
-			{/*		);*/}
-			{/*		setTimeout(() => {*/}
-			{/*			cacelToken.abort("fuck u");*/}
-			{/*		}, 100);*/}
-			{/*	}}*/}
-			{/*>*/}
-			{/*	ass asdasd*/}
-			{/*</button>*/}
-			{/*<OAuthUI />*/}
 		</div>
 	);
 };
