@@ -2,6 +2,8 @@ import React, { type FC } from "react";
 import { Button } from "@UI/button.tsx";
 import authServices from "@/services/auth.ts";
 import { FcGoogle } from "react-icons/fc";
+import { redirect } from "@/lib/utils.ts";
+import { toast } from "@/hooks/useToast.ts";
 
 const AvailableProviders = [
 	{
@@ -14,14 +16,18 @@ const AvailableProviders = [
 const OAuthProviders: FC = () => {
 	const OAuthEnabled = !!import.meta.env.PUBLIC_OAUTH_PROVIDERS;
 	if (!OAuthEnabled) return null;
-	console.log(import.meta.env.PUBLIC_OAUTH_PROVIDERS);
+
 	const providers = import.meta.env.PUBLIC_OAUTH_PROVIDERS?.replaceAll(/\s/g, "")?.split(",");
 	if (!providers || providers?.length === 0) throw new Error("OAuth is enabled but no OAuth providers found");
 
 	const handleProviderLogin = (provider: (typeof AvailableProviders)[number]["name"]) => () => {
 		authServices.requestOauthLink(provider).then(({ redirectUrl, error }) => {
-			if (error || !redirectUrl) return alert("Errr");
-			window.open(redirectUrl, "_blank");
+			if (error || !redirectUrl)
+				return toast({
+					variant: "destructive",
+					title: "Something went wrong.",
+				});
+			redirect(redirectUrl);
 		});
 	};
 
