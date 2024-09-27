@@ -51,11 +51,15 @@ func (p *Params) GetUserSessionData(c *fiber.Ctx) (UserSessionData, error) {
 
 	elapsedTime := time.Hour*time.Duration(MaxSessionLife) - time.Until(expiry)
 	if elapsedTime > time.Minute*time.Duration(MaxTokenLife) {
-		err = store.Regenerate()
-		if err != nil {
-			return userInfo, err
-		}
+
+		/** TODO:- this is a temp fix investigate the process further */
+
+		//err = store.Regenerate()
+		//if err != nil {
+		//	return userInfo, err
+		//}
 		userInfo.SessionExpiry = time.Now().Add(time.Hour * time.Duration(MaxSessionLife)).Format(time.DateTime)
+		store.SetExpiry(time.Hour * time.Duration(MaxSessionLife))
 		store.Set(UserInfoCookieKey, userInfo)
 		err = store.Save()
 		if err != nil {
