@@ -5,6 +5,7 @@ import { RxHamburgerMenu as HamburgerMenuIcon } from "react-icons/rx";
 import { cn } from "@/lib/shadcn-utils.ts";
 import AuthProvider from "@/auth/Provider.tsx";
 import AuthGuard from "@/auth/Guard.tsx";
+import { Skeleton } from "@UI/skeleton.tsx";
 
 interface Props {
 	children: ReactNode | ReactNode[];
@@ -26,13 +27,21 @@ const LinkItem: FC<LinkItemProps> = ({ href, title, currentRoute }) => {
 		</a>
 	);
 };
+
+const PanelLoadingComponent: FC = () => (
+	<div className={"flex h-[100svh] flex-row items-center gap-4 p-4"}>
+		<Skeleton className={"h-full md:w-44"} />
+		<Skeleton className={"h-full w-full"} />
+	</div>
+);
+
 const PanelLayout: FC<Props> = ({ children, currentRoute }) => {
 	const [menuVisible, setMenuVisible] = useState(false);
 	const toggleMenu = () => setMenuVisible(!menuVisible);
 
 	return (
 		<AuthProvider>
-			<AuthGuard>
+			<AuthGuard loadingComponent={<PanelLoadingComponent />}>
 				<div className="flex h-full w-full flex-col md:flex-row">
 					<div id="mobile-header" className="h-[50px] w-full justify-between md:hidden">
 						<HamburgerMenuIcon onClick={toggleMenu} id="hamburger-menu" className="cursor-pointer" />
