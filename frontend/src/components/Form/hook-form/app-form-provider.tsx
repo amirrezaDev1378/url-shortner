@@ -13,7 +13,7 @@ type Props = {
 
 export default function AppFormProvider({ children, onSubmit, methods, preventDefault = true, ...formProps }: Props) {
 	const shouldPreventDefault = !onSubmit && preventDefault;
-	console.log({ shouldPreventDefault });
+
 	const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		if (shouldPreventDefault) return e.preventDefault();
 		if (typeof onSubmit === "function") return onSubmit();
