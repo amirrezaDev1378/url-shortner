@@ -6,7 +6,7 @@ import SimpleTable from "@UI/SimpleTable.tsx";
 import { GetAllUrlsService } from "@/services/urls.ts";
 import { toast } from "@/hooks/useToast.ts";
 import { formatDateTime } from "@/lib/datetime.ts";
-import { formatShortedURL } from "@/lib/utils.ts";
+import { convertShortedURLsToDate } from "@/lib/utils.ts";
 import type { GetAllUrlsResponse } from "@/models/generated.ts";
 
 const columns: ColumnDef<GetAllUrlsResponse>[] = [
@@ -14,7 +14,7 @@ const columns: ColumnDef<GetAllUrlsResponse>[] = [
 		accessorKey: "slug",
 		header: "Link",
 		cell: (e) => {
-			const formatted: string = formatShortedURL(e.getValue() as string)?.toString() || "-";
+			const formatted: string = convertShortedURLsToDate(e.getValue() as string)?.toString() || "-";
 			return <a href={formatted}>{formatted}</a>;
 		},
 	},

@@ -13,3 +13,12 @@ export const setUserHasCreatedURlBefore = (): void => {
 export const redirect = (url: string) => {
 	window.location.assign(url);
 };
+
+export const convertShortedURLsToDate = (url: string): URL | null => {
+	if (!url) return null;
+
+	const createdUrl = new URL(import.meta.env.PUBLIC_URLS_DOMAIN);
+	createdUrl.pathname = url;
+
+	return createdUrl;
+};
