@@ -82,7 +82,6 @@ const CreateTempUrl: FC<CreateTempUrlProps> = (props) => {
 		});
 
 		if (serviceResponse.error) {
-			console.log(toast);
 			return toast({
 				title: "Error",
 				description: "Something went wrong",
