@@ -9,7 +9,7 @@ export const CreateTempUrlService = async (params: CreateUrlRequest): Promise<Se
 		.catch((e) => e);
 
 	const error = handleServiceError(result);
-	if (error) return { error };
+	if (error?.code) return { error };
 
 	return { data: result.data };
 };

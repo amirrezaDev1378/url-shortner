@@ -14,7 +14,7 @@ const CreateUrlService = async (params: CreateUrlRequest): Promise<ServiceRespon
 		.catch((e) => e);
 
 	const error = handleServiceError(res);
-	if (error) return { error };
+	if (error?.code) return { error };
 
 	return { data: res.data };
 };
