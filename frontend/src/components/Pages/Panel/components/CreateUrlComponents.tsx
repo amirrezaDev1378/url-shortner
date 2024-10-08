@@ -1,13 +1,19 @@
-import React, { type FC, useEffect, useState } from "react";
+import React, { type FC, useState } from "react";
 import { useForm } from "react-hook-form";
 import AppFormProvider from "@/components/Form/hook-form/app-form-provider.tsx";
 import RHFTextInput from "@/components/Form/hook-form/rhf-text-input.tsx";
 import { Button } from "@UI/button.tsx";
 import { Label } from "@UI/label.tsx";
-import { Checkbox } from "@UI/checkbox.tsx";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateUrlRequest } from "@/models/generated.ts";
+import type { CreateUrlRequest, CreateUrlResponse } from "@/models/generated.ts";
+import { ZodUrl } from "@/lib/validation.ts";
+import { AnimatePresence, motion } from "framer-motion";
+import { LuX as XIcon } from "react-icons/lu";
+import { AnimatedTabs, type Tab } from "@UI/AnimatedTabs.tsx";
+import CreatedUrlInfoModal from "@/components/Pages/TempURLs/components/CreatedUrlInfoModal.tsx";
+import { useToast } from "@/hooks/useToast.ts";
+import { CreateUrlService } from "@/services/urls.ts";
 
 const CreateUrlWithPage: FC = () => {
 	return <div></div>;
@@ -16,123 +22,151 @@ const CreateUrlWithProxy: FC = () => {
 	return <div></div>;
 };
 
-type CreateStandardUrlProps = {
-	onSubmit: (data: CreateUrlRequest) => void;
-};
+const ExpirationOptions = {
+	"1 Hour": 60 * 60 * 1000,
+	"1 Day": 24 * 60 * 60 * 1000,
+	"1 Week": 7 * 24 * 60 * 60 * 1000,
+	"1 Month": 30 * 24 * 60 * 60 * 1000,
+	"3 Month": 3 * 30 * 24 * 60 * 60 * 1000,
+	Never: -1,
+} as const;
 
-const CreateStandardUrl: FC<CreateStandardUrlProps> = ({ onSubmit }) => {
-	const standardUrlSchema = z.strictObject({
-		slug: z.string().trim().min(1),
-		ios_redirect_path: z
-			.string()
-			.trim()
-			.min(1)
-			.url()
-			.optional()
-			.or(z.literal(""))
-			.refine((r) => (customDevicesState.ios ? !!r : true), { message: "Provide ios link" }),
-		general_redirect_path: z
-			.string()
-			.trim()
-			.min(1)
-			.url()
-			.optional()
-			.or(z.literal(""))
-			.refine((r) => (customDevicesState.android ? !!r : true), { message: "Provide android link" }),
-	});
-	const methods = useForm<z.infer<typeof standardUrlSchema>>({
-		resolver: zodResolver(standardUrlSchema),
+const ExpirationOptionsTab: Tab[] = Object.entries(ExpirationOptions).map((e) => ({
+	title: e[0],
+	value: e[1],
+}));
+
+const CreateStandardUrl: FC = () => {
+	const [customIosLink, setCustomIosLink] = useState<boolean>(false);
+	const [activeExpiration, setActiveExpiration] = useState<Tab>(ExpirationOptionsTab[0]);
+	const [createdUrlModalInfo, setCreatedUrlModalInfo] = useState<
+		Partial<Omit<CreateUrlResponse, "id">> & {
+			open: boolean;
+		}
+	>({} as never);
+
+	const { toast } = useToast();
+	const temporaryUrlSchema = z.strictObject({
+		expiration: z.nativeEnum(ExpirationOptions),
+		ios_redirect_path: ZodUrl.optional().or(z.literal("")),
+		general_redirect_path: ZodUrl,
+	} satisfies { [key in keyof Omit<CreateUrlRequest, "type" | "slug">]: any });
+
+	const methods = useForm<z.infer<typeof temporaryUrlSchema>>({
+		resolver: zodResolver(temporaryUrlSchema),
 		mode: "all",
 		defaultValues: {
-			slug: "",
+			expiration: ExpirationOptionsTab[0].value,
 			general_redirect_path: "",
 			ios_redirect_path: "",
 		},
 	});
+
 	const {
 		handleSubmit,
 		trigger,
+		setValue,
 		formState: { errors },
 	} = methods;
 
-	const [customDevicesState, setCustomDevicesState] = useState({
-		ios: false,
-		android: false,
-	});
-	const toggleCustomDevice = (type: "ios" | "android") => () =>
-		setCustomDevicesState((p) => ({
-			...p,
-			[type]: !p[type],
-		}));
+	const onExpirationChange = (newExpiration: Tab) => {
+		setValue("expiration", newExpiration.value);
+		setActiveExpiration(newExpiration);
+	};
 
-	useEffect(() => {
-		trigger("ios_redirect_path");
-		trigger("general_redirect_path");
-	}, [customDevicesState]);
-	const onFormSubmit = handleSubmit((data) =>
-		onSubmit({
-			general_redirect_path: data.general_redirect_path as string,
-			ios_redirect_path: data.ios_redirect_path as string,
+	const onFormSubmit = handleSubmit(async (data) => {
+		const expiration = data.expiration > 0 ? new Date(Date.now() + data.expiration).toISOString() : null;
+		const serviceResponse = await CreateUrlService({
+			general_redirect_path: data.general_redirect_path,
+			expiration,
+			ios_redirect_path: data.ios_redirect_path || "",
 			type: "direct",
-			expiration: "never",
-		})
-	);
+		});
+
+		if (serviceResponse.error) {
+			return toast({
+				title: "Error",
+				description: "Something went wrong",
+				open: true,
+			});
+		}
+
+		setCreatedUrlModalInfo({
+			slug: serviceResponse.data?.slug || "",
+			expiration: new Date(serviceResponse.data?.expiration || "").toISOString(),
+			open: true,
+		});
+	});
 
 	return (
-		<AppFormProvider onSubmit={onFormSubmit} className={"flex w-full flex-col items-center"} methods={methods}>
-			<div className={"flex w-[50%] flex-col flex-wrap gap-6 rounded-xl border-2 border-solid border-neutral-700 p-6"}>
-				<h4 className={"mb-2 text-center text-4xl"}>Standard URL</h4>
+		<>
+			<AppFormProvider preventDefault className={"flex w-full flex-col items-center"} methods={methods}>
+				<div
+					className={"relative flex w-10/12 flex-col flex-wrap gap-6 rounded-xl border-2 border-solid border-neutral-700 p-6 md:w-1/2"}
+				>
+					<h4 className={"mb-2 w-full text-center text-4xl"}>Standard URL</h4>
 
-				<RHFTextInput
-					helperText={"Enter a name for your link, this will not be shown to anyone, it's just for your self"}
-					animatedInput
-					animateError
-					name={"name"}
-					label={"name"}
-				/>
-				<RHFTextInput animatedInput animateError name={"destination"} label={"Destination URL"} />
-				<div className={"flex w-full flex-col items-start"}>
-					<Label className={"pb-1"}>Slug</Label>
-					<div className={"flex w-full flex-row items-end gap-6"}>
-						<p className={"pb-1 text-3xl"}>{import.meta.env.PUBLIC_URLS_DOMAIN} /</p>
-						<RHFTextInput
-							hideFormMessages
-							animatedInput
-							animateError
-							name={"slug"}
-							placeholder={"slug"}
-							wrapperProps={{ className: "flex-1" }}
+					<RHFTextInput animatedInput animateError name={"general_redirect_path"} label={"Destination URL"} />
+
+					<AnimatePresence mode={"popLayout"}>
+						{!customIosLink && (
+							<motion.div
+								key={"add-custom-ios-url"}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="flex"
+							>
+								<Button onClick={() => setCustomIosLink(true)}>Add Custom Destination for IOS</Button>
+							</motion.div>
+						)}
+
+						{customIosLink && (
+							<motion.div
+								key={"ios-custom-url"}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className={"flex w-full flex-row items-center justify-between gap-6"}
+							>
+								<RHFTextInput
+									wrapperProps={{ className: "flex-1" }}
+									disabled={!customIosLink}
+									animatedInput
+									animateError
+									name={"ios_redirect_path"}
+									label={"IOS Destination"}
+									description={"If you like to redirect IOS users to another url, use this option."}
+								/>
+								<Button onClick={() => setCustomIosLink(false)}>
+									<XIcon />
+								</Button>
+							</motion.div>
+						)}
+					</AnimatePresence>
+					<div className={"flex flex-col gap-3"}>
+						<Label>Expiration</Label>
+						<AnimatedTabs
+							containerClassName={"w-full flex flex-row flex-wrap md:flex-nowrap items-start j"}
+							activeTab={activeExpiration}
+							setActiveTab={onExpirationChange}
+							tabs={ExpirationOptionsTab}
 						/>
-						<Button className={"m-[2px] h-[40px]"}>Generate Link</Button>
 					</div>
+
+					<Button onClick={onFormSubmit} type={"submit"} className={"w-full"}>
+						create
+					</Button>
 				</div>
-				<div className={"flex w-full flex-row items-center justify-between gap-6"}>
-					<RHFTextInput
-						wrapperProps={{ className: "flex-1" }}
-						disabled={!customDevicesState.ios}
-						animatedInput
-						animateError
-						name={"ios-destination"}
-						label={"IOS Destination"}
-						description={"If you like to redirect IOS users to another url, use this option."}
-					/>
-					<Checkbox className={"mb-2"} checked={customDevicesState.ios} onClick={toggleCustomDevice("ios")} />
-				</div>
-				<div className={"flex w-full flex-row items-center justify-between gap-6"}>
-					<RHFTextInput
-						wrapperProps={{ className: "flex-1" }}
-						disabled={!customDevicesState.android}
-						animatedInput
-						animateError
-						name={"android-destination"}
-						label={"Android Destination"}
-						description={"If you like to redirect Android users to another url, use this option."}
-					/>
-					<Checkbox className={"mb-2"} checked={customDevicesState.android} onClick={toggleCustomDevice("android")} />
-				</div>
-				<Button type={"submit"}>create</Button>
-			</div>
-		</AppFormProvider>
+			</AppFormProvider>
+			{createdUrlModalInfo.open && (
+				<CreatedUrlInfoModal
+					slug={createdUrlModalInfo.slug as string}
+					expiration={createdUrlModalInfo.expiration as string}
+					onClose={() => setCreatedUrlModalInfo({ open: false })}
+				/>
+			)}
+		</>
 	);
 };
 
