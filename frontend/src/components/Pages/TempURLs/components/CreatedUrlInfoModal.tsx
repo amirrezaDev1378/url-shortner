@@ -20,7 +20,7 @@ const CreatedUrlInfoModal: FC<CreatedUrlInfoModalProps> = ({ slug, expiration, o
 	const isFirstUrl = !userHasCreatedURlBefore();
 
 	useEffect(() => {
-		if (isFirstUrl || true) {
+		if (isFirstUrl) {
 			confetti({
 				particleCount: 100,
 				spread: 70,
