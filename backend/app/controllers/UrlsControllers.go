@@ -99,10 +99,10 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 			logger.Err(err).Msg("Error while scanning userID")
 			return handleError(appErrors.ErrGeneralServerError.Error())
 		}
+		expiresAt := pgtype.Timestamp{}
 
-		expiresAt := pgtype.Timestamp{Valid: false}
 		if payload.Expiration != "" {
-			err = expiresAt.Scan(payload.Expiration)
+			expiresAt, err := utils.GetPGTimeStamp(payload.Expiration, time.RFC3339)
 			if err != nil || !expiresAt.Valid {
 				logger.Err(err).Msg("Error while scanning expiration")
 				return handleError(appErrors.ErrGeneralServerError.SendCtx(ctx))
