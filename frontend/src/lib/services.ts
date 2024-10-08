@@ -7,7 +7,7 @@ export interface ServiceError {
 
 export interface ServiceResponse<T extends any> {
 	data?: T;
-	error?: ServiceError;
+	error?: Partial<ServiceError>;
 }
 
 export interface ServerErrorResponse {
