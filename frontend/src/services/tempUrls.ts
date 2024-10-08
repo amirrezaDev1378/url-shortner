@@ -1,10 +1,10 @@
-import { generalRequest } from "@/lib/request.ts";
+import { appRequest } from "@/lib/request.ts";
 import type { CreateUrlRequest, CreateUrlResponse } from "@/models/generated.ts";
 import { handleServiceError, type ServiceResponse } from "@/lib/services.ts";
 import type { AxiosResponse } from "axios";
 
 export const CreateTempUrlService = async (params: CreateUrlRequest): Promise<ServiceResponse<CreateUrlResponse>> => {
-	const result = await generalRequest
+	const result = await appRequest
 		.post<CreateUrlRequest, AxiosResponse<CreateUrlResponse>>("/temp-urls/create", params as CreateUrlRequest)
 		.catch((e) => e);
 
