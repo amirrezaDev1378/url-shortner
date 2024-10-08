@@ -1,5 +1,5 @@
 import { appRequest } from "@/lib/request.ts";
-import type { CreateUrlRequest, CreateUrlResponse } from "@/models/generated.ts";
+import type { CreateUrlRequest, CreateUrlResponse, GetAllUrlsResponse } from "@/models/generated.ts";
 import { handleServiceError, type ServiceResponse } from "@/lib/services.ts";
 import type { AxiosResponse } from "axios";
 
@@ -19,4 +19,13 @@ const CreateUrlService = async (params: CreateUrlRequest): Promise<ServiceRespon
 	return { data: res.data };
 };
 
-export { CreateUrlService };
+const GetAllUrlsService = async (): Promise<ServiceResponse<GetAllUrlsResponse>> => {
+	const res = await appRequest.get("/urls/get-all").catch((e) => e);
+
+	const error = handleServiceError(res);
+	if (error?.code) return { error };
+
+	return { data: res.data };
+};
+
+export { CreateUrlService, GetAllUrlsService };
