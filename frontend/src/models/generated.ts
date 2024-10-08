@@ -26,7 +26,7 @@ export interface UrlResponse extends BaseUrl {
 }
 export interface CreateUrlRequest extends CreateUrlBase {
 	type: string;
-	expiration: string;
+	expiration: string | null;
 }
 export interface UpdateUrlRequest extends CreateUrlBase {
 	id: string;
