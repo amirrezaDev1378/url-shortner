@@ -15,6 +15,10 @@ export const initIdsRequest = () => {
 	return _idsRequest;
 };
 
-export const generalRequest = axios.create({
+export const appRequest = axios.create({
 	baseURL: import.meta.env.PUBLIC_BACKEND_URL,
+	withCredentials: true,
+	headers: {
+		"Content-Type": "application/json",
+	},
 });
