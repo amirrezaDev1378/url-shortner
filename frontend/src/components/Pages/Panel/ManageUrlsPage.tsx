@@ -66,7 +66,7 @@ const ManageUrlsPage: FC = () => {
 				setUrlsServiceData({ error: e });
 				toast({
 					variant: "destructive",
-					title: "Something Went Wrong While getting URLs List...",
+					title: "Something went wrong while getting URLs list...",
 					description: <Button onClick={(e) => window.location.reload()}>Try To Refresh Page.</Button>,
 				});
 			})
