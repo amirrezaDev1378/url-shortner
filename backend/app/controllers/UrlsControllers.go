@@ -145,13 +145,16 @@ func (ac *AppControllers) UrlsControllers(router fiber.Router) {
 		return ctx.JSON(url)
 	})
 	urlRouter.Delete("/delete/:id<int>", func(ctx *fiber.Ctx) error {
+		resp := models.DeleteUrlResponse{}
+
 		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
 			Deleted: true,
 		})
 		if err.IsNotEmpty() {
 			return err.Send(ctx)
 		}
-		return ctx.Status(201).Send(nil)
+		resp.Success = true
+		return ctx.Status(201).JSON(&resp)
 	})
 	urlRouter.Put("/disable/:id<int>", func(ctx *fiber.Ctx) error {
 		err := urlService.UpdateUrlProps(ctx.Context(), ctx.Locals("userID"), ctx.Params("id"), services.UrlUpdatableProps{
