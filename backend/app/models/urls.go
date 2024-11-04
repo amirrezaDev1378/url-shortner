@@ -28,6 +28,10 @@ type UpdateUrlRequest struct {
 type DeleteUrlRequest struct {
 	ID string `json:"id" validate:"required,uuid"`
 }
+
+type DeleteUrlResponse struct {
+	Success bool `json:"success" validate:"required,boolean"`
+}
 type GetAllUrlsResponse []UrlResponse
 
 type GetRandomSlugResponse struct {
