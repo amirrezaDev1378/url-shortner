@@ -26,13 +26,16 @@ export interface UrlResponse extends BaseUrl {
 }
 export interface CreateUrlRequest extends CreateUrlBase {
 	type: string;
-	expiration: string | null;
+	expiration: string;
 }
 export interface UpdateUrlRequest extends CreateUrlBase {
 	id: string;
 }
 export interface DeleteUrlRequest {
 	id: string;
+}
+export interface DeleteUrlResponse {
+	success: boolean;
 }
 export type GetAllUrlsResponse = UrlResponse[];
 export interface GetRandomSlugResponse {
