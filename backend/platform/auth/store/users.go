@@ -80,6 +80,7 @@ func (p *Params) CreateUserWithOAuth(ctx context.Context, user StorableUser) (cr
 
 	userUUID, err := p.DB.AppQueries.CreateUser(ctx, dbQueries.CreateUserParams{
 		Avatar:         user.Avatar,
+		Name:           user.Name.String,
 		Email:          user.Email,
 		CreatedByOauth: pgtype.Bool{Bool: true, Valid: true},
 	})
