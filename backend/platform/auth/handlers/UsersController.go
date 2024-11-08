@@ -67,7 +67,8 @@ func UsersController(router fiber.Router, p *authConfig.Params) {
 			return generalServerErr.Send(ctx)
 		}
 
-		if err := ctx.JSON(models.UserInfoResponse{ID: sessionData.UserId, Email: user.Email}); err != nil {
+		resp := models.UserInfoResponse{ID: sessionData.UserId, Email: user.Email, Avatar: user.Avatar.String, Name: user.Name}
+		if err := ctx.JSON(resp); err != nil {
 			sLog.WithStackTrace(err).Send()
 			return generalServerErr.Send(ctx)
 		}
