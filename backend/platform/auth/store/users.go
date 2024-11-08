@@ -22,6 +22,7 @@ import (
 type StorableUser struct {
 	Email     string      `json:"email" Validate:"email,required,max=100"`
 	Avatar    pgtype.Text `json:"picture" Validate:"required_if=OAuthUser true,omitempty,url"`
+	Name      pgtype.Text `json:"name" Validate:"required_if=OAuthUser true,omitempty,min=1,max=100"`
 	Password  string      `json:"password" Validate:"required_if=OAuthUser false,omitempty,min=6,max=20"`
 	OAuthUser bool        `Validate:"boolean"`
 	isValid   bool
