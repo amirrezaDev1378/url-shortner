@@ -33,35 +33,28 @@ const handleOAuthLogin = async (params: { provider: string; code: string; state:
 		});
 };
 
-const createAccountWithEmail = ({ email, password }: { email: string; password: string }) => {
-	return idsRequest
-		.post("/email/register", {
-			email,
-			password,
-		})
-		.then((r) => {
-			if (!r.data.success) throw new Error("Something went wrong");
-			return r;
-		});
-};
-
-const loginWithEmail = ({ email, password }: { email: string; password: string }) => {
-	return idsRequest
-		.post("/email/login", {
-			email,
-			password,
-		})
-		.then((r) => {
-			if (!r.data.success) throw new Error("Something went wrong");
-			return r;
-		});
-};
-
-const getUserInfo = () => {
-	return idsRequest.get<UserInfoResponse>("/user/user-info").then((r) => {
-		if (!r.data.id) throw new Error("Something went wrong");
-		return r;
+const createAccountWithEmail = async ({ email, password }: { email: string; password: string }) => {
+	const r = await idsRequest.post("/email/register", {
+		email,
+		password,
 	});
+	if (!r.data.success) throw new Error("Something went wrong");
+	return r;
+};
+
+const loginWithEmail = async ({ email, password }: { email: string; password: string }) => {
+	const r = await idsRequest.post("/email/login", {
+		email,
+		password,
+	});
+	if (!r.data.success) throw new Error("Something went wrong");
+	return r;
+};
+
+const getUserInfo = async () => {
+	const r = await idsRequest.get<UserInfoResponse>("/user/user-info");
+	if (!r.data.id) throw new Error("Something went wrong");
+	return r;
 };
 
 const authServices = {
