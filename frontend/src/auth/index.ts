@@ -18,6 +18,8 @@ export const useInitAuth = () => {
 					user: {
 						id: r.data.id,
 						email: r.data.email,
+						name: r.data.name,
+						avatar: r.data.avatar,
 					},
 					isAuthenticated: true,
 					isLoading: false,
