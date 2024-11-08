@@ -1,4 +1,5 @@
 -- +goose Up
+-- +goose StatementBegin
 CREATE OR REPLACE FUNCTION base62_encode(num BIGINT) RETURNS TEXT AS
 $$
 DECLARE
@@ -19,6 +20,8 @@ BEGIN
     RETURN encoded;
 END;
 $$ LANGUAGE plpgsql;
+-- +goose StatementEnd
+
 
 -- +goose Down
 DROP FUNCTION base62_encode(num BIGINT);
