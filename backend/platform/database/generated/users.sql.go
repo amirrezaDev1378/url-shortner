@@ -24,8 +24,8 @@ func (q *Queries) CheckUserExists(ctx context.Context, email string) (bool, erro
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO USERS (ID, CREATED_AT, UPDATED_AT, LAST_LOGIN, PASSWORD, CREATED_BY_OAUTH, EMAIL, RESET_PASSWORD_EXPIRES,
-                   AVATAR)
-VALUES (UUID_GENERATE_V4(), NOW(), NOW(), NOW(), $1, $2, $3, NULL, $4)
+                   AVATAR,NAME)
+VALUES (UUID_GENERATE_V4(), NOW(), NOW(), NOW(), $1, $2, $3, NULL, $4 , $5)
 RETURNING ID
 `
 
@@ -34,6 +34,7 @@ type CreateUserParams struct {
 	CreatedByOauth pgtype.Bool `json:"created_by_oauth"`
 	Email          string      `json:"email"`
 	Avatar         pgtype.Text `json:"avatar"`
+	Name           string      `json:"name"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (pgtype.UUID, error) {
@@ -42,6 +43,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (pgtype.
 		arg.CreatedByOauth,
 		arg.Email,
 		arg.Avatar,
+		arg.Name,
 	)
 	var id pgtype.UUID
 	err := row.Scan(&id)
@@ -49,7 +51,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (pgtype.
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, last_login, email, password, avatar, login_attempts, locked_until, created_by_oauth, reset_password_token, reset_password_expires FROM USERS WHERE EMAIL = $1 LIMIT 1
+SELECT id, created_at, updated_at, last_login, email, password, avatar, login_attempts, locked_until, created_by_oauth, reset_password_token, reset_password_expires, name FROM USERS WHERE EMAIL = $1 LIMIT 1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -68,12 +70,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.CreatedByOauth,
 		&i.ResetPasswordToken,
 		&i.ResetPasswordExpires,
+		&i.Name,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, created_at, updated_at, last_login, email, password, avatar, login_attempts, locked_until, created_by_oauth, reset_password_token, reset_password_expires
+SELECT id, created_at, updated_at, last_login, email, password, avatar, login_attempts, locked_until, created_by_oauth, reset_password_token, reset_password_expires, name
 FROM USERS
 WHERE ID = $1
 LIMIT 1
@@ -95,6 +98,7 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.CreatedByOauth,
 		&i.ResetPasswordToken,
 		&i.ResetPasswordExpires,
+		&i.Name,
 	)
 	return i, err
 }

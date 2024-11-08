@@ -88,4 +88,5 @@ type User struct {
 	CreatedByOauth       pgtype.Bool      `json:"created_by_oauth"`
 	ResetPasswordToken   pgtype.Text      `json:"reset_password_token"`
 	ResetPasswordExpires pgtype.Date      `json:"reset_password_expires"`
+	Name                 string           `json:"name"`
 }
