@@ -57,12 +57,17 @@ const getUserInfo = async () => {
 	return r;
 };
 
+const logoutUser = async () => {
+	return await idsRequest.post<unknown>("/user/logout");
+};
+
 const authServices = {
 	requestOauthLink,
 	handleOAuthLogin,
 	createAccountWithEmail,
 	loginWithEmail,
 	getUserInfo,
+	logoutUser,
 };
 
 export default authServices;
