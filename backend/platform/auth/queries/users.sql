@@ -7,8 +7,8 @@ LIMIT 1;
 
 -- name: CreateUser :one
 INSERT INTO USERS (ID, CREATED_AT, UPDATED_AT, LAST_LOGIN, PASSWORD, CREATED_BY_OAUTH, EMAIL, RESET_PASSWORD_EXPIRES,
-                   AVATAR)
-VALUES (UUID_GENERATE_V4(), NOW(), NOW(), NOW(), $1, $2, $3, NULL, $4)
+                   AVATAR, NAME)
+VALUES (UUID_GENERATE_V4(), NOW(), NOW(), NOW(), $1, $2, $3, NULL, $4, $5)
 RETURNING ID;
 
 -- name: GetUserByEmail :one
