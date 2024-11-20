@@ -80,6 +80,6 @@
 
 @layer components {
 	.lightbox {
-		@apply absolute inset-0 bg-neutral-900 opacity-90 backdrop-blur-3xl;
+		@apply absolute inset-0 z-30 bg-white/30 bg-opacity-30 backdrop-blur-md;
 	}
 }
