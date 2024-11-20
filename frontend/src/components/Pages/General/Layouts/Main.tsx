@@ -23,7 +23,11 @@ export interface MainGeneralLayoutProps {
 	children: React.ReactNode | React.ReactNode[];
 }
 
-const UserMenu = () => {
+// TODO separate this component
+export interface UserMenuProps {
+	contentProps?: React.ComponentPropsWithoutRef<typeof DropdownMenuContent>;
+}
+export const UserMenu: FC<UserMenuProps> = ({ contentProps }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { toast } = useToast();
 	const { isLoading, isAuthenticated, user } = useAuthStore();
@@ -48,7 +52,7 @@ const UserMenu = () => {
 					</Avatar>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-56" align="end" forceMount>
+			<DropdownMenuContent className="w-56" align="end" forceMount {...contentProps}>
 				<DropdownMenuLabel className="font-normal">
 					<div className="flex flex-col space-y-1">
 						{user.name && <p className="text-sm font-medium leading-none">{user.name}</p>}
