@@ -5,7 +5,7 @@ import { RxHamburgerMenu as HamburgerMenuIcon } from "react-icons/rx";
 import { cn } from "@/lib/shadcn-utils.ts";
 import AuthGuard from "@/auth/Guard.tsx";
 import { Skeleton } from "@UI/skeleton.tsx";
-import { UserMenu } from "@/components/Pages/General/Layouts/Main.tsx";
+import { UserMenu } from "@/components/Pages/General/Layouts/Main";
 
 interface Props {
 	children: ReactNode | ReactNode[];

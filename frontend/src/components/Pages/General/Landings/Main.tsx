@@ -5,7 +5,7 @@ import { AuroraBackground } from "@/components/AnimatedSections/AuroraBackground
 import { motion } from "framer-motion";
 import { Button } from "@UI/button.tsx";
 import { Dialog, DialogContent, DialogDescription } from "@UI/dialog.tsx";
-import MainGeneralLayout from "@/components/Pages/General/Layouts/Main.tsx";
+import MainGeneralLayout from "@/components/Pages/General/Layouts/Main";
 
 const MainLanding: FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
