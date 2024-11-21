@@ -28,7 +28,7 @@ const MainLayoutHeader: FC = () => {
 	const menuState: keyof typeof MenuStates = isLoading ? "loading" : isAuthenticated ? "authenticated" : "notAuthenticated";
 
 	return (
-		<header className={"relative flex w-full flex-row items-center justify-between px-3"}>
+		<header className={"relative flex w-full snap-center flex-row items-center justify-between px-3"}>
 			<div className={"flex w-fit flex-row items-center gap-3"}>
 				<motion.div
 					initial={false}

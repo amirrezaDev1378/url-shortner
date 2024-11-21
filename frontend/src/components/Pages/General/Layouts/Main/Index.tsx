@@ -8,7 +8,7 @@ export interface MainGeneralLayoutProps {
 
 const MainGeneralLayout: FC<MainGeneralLayoutProps> = ({ children }) => {
 	return (
-		<div className={"flex h-full w-full flex-col items-center"}>
+		<div className={"flex h-[100svh] w-full snap-y snap-mandatory flex-col items-center overflow-auto"}>
 			<MainLayoutHeader />
 			{children}
 			<MainLayoutFooter />

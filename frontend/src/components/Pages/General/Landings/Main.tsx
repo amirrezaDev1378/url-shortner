@@ -5,7 +5,7 @@ import { AuroraBackground } from "@/components/AnimatedSections/AuroraBackground
 import { motion } from "framer-motion";
 import { Button } from "@UI/button.tsx";
 import { Dialog, DialogContent, DialogDescription } from "@UI/dialog.tsx";
-import MainGeneralLayout from "@/components/Pages/General/Layouts/Main";
+import MainGeneralLayout from "@/components/Pages/General/Layouts/Main/Index.tsx";
 
 const MainLanding: FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -13,7 +13,7 @@ const MainLanding: FC = () => {
 
 	return (
 		<MainGeneralLayout>
-			<div className={"h-[100svh] w-full snap-y snap-mandatory overflow-auto"}>
+			<div className={"w-full"}>
 				<div className="relative flex h-[100svh] w-full snap-center overflow-hidden rounded-md bg-black/[0.96] antialiased bg-grid-white/[0.02] md:items-center md:justify-center">
 					<Spotlight className="-top-40 left-0 md:-top-20 md:left-60" fill="white" />
 					<div className="flex h-[40rem] items-center justify-center px-4">

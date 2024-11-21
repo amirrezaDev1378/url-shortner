@@ -8,3 +8,9 @@ TODO add content
 chart components:
 
 https://recharts.org/en-US/examples/TwoLevelPieChart
+
+https://github.com/http-party/http-server
+
+caddy server
+
+FOR PROPER AUTH SYSTEM USAGE YOU SHOULD RUN BACKEND AND FRONTEND ON SAFE DOMAINS ETC 127.0.0.1 PORT DOES NOT MATTER
