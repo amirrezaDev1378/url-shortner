@@ -3,3 +3,5 @@
 **/bun.lockb
 **/dist
 **/.astro
+**/.env*
+!/**.env.example
