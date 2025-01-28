@@ -28,6 +28,13 @@ func PostgreSQLConnection() (context.Context, *pgxpool.Pool, error) {
 		return nil, nil, errors.New("DB_MAX_LIFETIME_CONNECTIONS should be between 1 and 60")
 	}
 	ctx := context.Background()
+	println(fmt.Sprintf("user=%s dbname=%s sslmode=disable host=%s port=%s password=%s",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_PASSWORD"),
+	))
 	db, err := pgxpool.New(ctx, fmt.Sprintf("user=%s dbname=%s sslmode=disable host=%s port=%s password=%s",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_NAME"),

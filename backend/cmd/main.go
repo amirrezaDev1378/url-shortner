@@ -49,6 +49,7 @@ func FiberConfig() fiber.Config {
 }
 
 func main() {
+
 	time.Local = time.UTC
 	sLog.InitLogger()
 	config := FiberConfig()
@@ -59,7 +60,10 @@ func main() {
 	queries, dbConnection, ctx := database.InitDatabase()
 	redisClients, err := cache.RedisConnection()
 	if err != nil {
-		return
+		// As you can this fucking early return here did not log any errors, so I wasted 2 fucking days trying to figure out why this shit exit with status of fucking 0
+		//(Old code so every body can see!) return
+
+		panic(err)
 	}
 
 	databaseParams := database.Params{

@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gofiber/storage/redis"
+	"os"
 	"time"
 )
 
@@ -30,6 +31,8 @@ func InitSessionStore(db *database.Params) Params {
 		Expiration:     time.Hour * time.Duration(MaxSessionLife),
 		Storage: redis.New(redis.Config{
 			Database: 3,
+			Host:     os.Getenv("REDIS_HOST"),
+			Password: os.Getenv("REDIS_PASSWORD"),
 		}),
 		CookieSecure: true,
 		KeyGenerator: utils.UUIDv4,

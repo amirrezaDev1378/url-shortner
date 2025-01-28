@@ -1,23 +1,26 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
+RUN apk add build-base
 
-# Move to working directory (/build).
 WORKDIR /build
 
-# Copy and download dependency using go mod.
 COPY go.mod go.sum ./
+RUN go env -w GO111MODULE=on
+RUN go env -w GOPROXY=https://goproxy.cn,direct
 RUN go mod download
 
-# Copy the code into the container.
 COPY . .
 
-# Set necessary environment variables needed for our image and build the API server.
-ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build -ldflags="-s -w" -o apiserver .
+ENV CGO_ENABLED=1
+RUN go build -ldflags="-s -w" -o apiserver ./cmd/main.go
 
-FROM scratch
+FROM alpine:latest
 
-# Copy binary and config files from /build to root folder of scratch container.
-COPY --from=builder ["/build/apiserver", "/build/.env", "/"]
+# WORKDIR /app
 
-# Command to run when starting the container.
-ENTRYPOINT ["/apiserver"]
+COPY --from=builder  "/build/.env.prod" "/app/.env"
+COPY --from=builder "/build/apiserver" "/app/apiserver"
+
+EXPOSE 3033
+
+CMD ["./app/apiserver"]
+

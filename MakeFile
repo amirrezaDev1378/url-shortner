@@ -1,0 +1,8 @@
+# This is not probably needed but it's just here so i don't forget this stuff
+
+
+compose-build-all:
+	docker compose  -f docker-compose.prod.yml up --build
+
+compose-migrations-up:
+	docker compose  -f docker-compose.prod.yml up --build db-migration

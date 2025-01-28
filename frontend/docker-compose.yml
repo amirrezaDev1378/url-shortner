@@ -1,0 +1,15 @@
+services:
+   frontend-service:
+      env_file:
+         - ./.env.prod
+      build:
+         context: .
+         dockerfile: Dockerfile
+
+      container_name: uos_frontend
+      restart: on-failure
+      networks:
+         - frontend-network
+
+networks:
+   frontend-network:

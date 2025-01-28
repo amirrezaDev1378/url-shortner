@@ -195,7 +195,7 @@ func InitLogger() {
 	ConsoleWriter := consoleWriter{}
 	ConsoleWriter.Init()
 
-	if configs.IsDev() {
+	if configs.IsDev() || true {
 		ConsoleWriter.Enable()
 	}
 

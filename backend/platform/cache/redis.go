@@ -37,6 +37,7 @@ func RedisConnection() (RedisClients, error) {
 
 	// Build Redis connection URL.
 	redisConnURL, err := utils.ConnectionURLBuilder("redis")
+	println(redisConnURL)
 	if err != nil {
 		return clients, fmt.Errorf("failed to build Redis connection URL: %v", err)
 	}

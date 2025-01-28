@@ -10,7 +10,7 @@ export const lightBoxZIndex = 999;
 const LightBox: FC<Props> = ({ children, visible, className, ...containerProps }) => {
 	return (
 		<div
-			className={cn({ "absolute inset-0 backdrop-blur-3xl bg-neutral-900 opacity-90": visible }, { "opacity-0": !visible }, className)}
+			className={cn({ "absolute inset-0 bg-neutral-900 opacity-90 backdrop-blur-3xl": visible }, { "opacity-0": !visible }, className)}
 			{...containerProps}
 		>
 			{children}

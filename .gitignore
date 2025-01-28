@@ -1,3 +1,5 @@
 **/node_modules
 **/.idea
 **/bun.lockb
+**/dist
+**/.astro

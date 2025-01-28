@@ -1,12 +1,12 @@
 {
-  "printWidth" : 140,
-  "tabWidth" : 3,
-  "useTabs" : true,
-  "semi" : true,
-  "singleQuote" : false,
-  "trailingComma" : "es5",
-  "bracketSpacing" : true,
-  "arrowParens" : "always",
-  "quoteProps" : "as-needed",
-  "plugins" : ["prettier-plugin-tailwindcss", "prettier-plugin-astro"]
+	"printWidth": 140,
+	"tabWidth": 3,
+	"useTabs": true,
+	"semi": true,
+	"singleQuote": false,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"arrowParens": "always",
+	"quoteProps": "as-needed",
+	"plugins": ["prettier-plugin-tailwindcss", "prettier-plugin-astro"]
 }

@@ -1,0 +1,78 @@
+#TODO Separate env files for each service
+version: "3.9"
+services:
+  api-server:
+    env_file:
+      - ./.env.prod
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    depends_on:
+      - postgresql-service
+      - redis-service
+    ports:
+      - "3033:3033"
+    networks:
+      - postgresql-network
+      - redis-network
+      - api-server-network
+    volumes:
+      - api-server-exec:/build
+
+
+  postgresql-service:
+    env_file:
+      - ./.env.prod
+    image: postgres:15-alpine
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - postgresql-network
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    restart: always
+
+  redis-service:
+    env_file:
+      - ./.env.prod
+    image: redis:7.0.8-alpine
+    container_name: redis
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
+    restart: always
+    networks:
+      - redis-network
+    volumes:
+      - redis-data:/data
+
+  db-migration:
+    env_file:
+      - ./.env.prod
+    build:
+      context: .
+      dockerfile: migrations.Dockerfile
+    container_name: db-migration
+    restart: no
+    depends_on:
+      - postgresql-service
+    networks:
+      - postgresql-network
+
+
+
+networks:
+  postgresql-network:
+  redis-network:
+  api-server-network:
+
+volumes:
+  postgresql-data:
+  redis-data:
+  api-server-exec:
+
+
